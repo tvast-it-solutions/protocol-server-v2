@@ -11,6 +11,7 @@ export function combineURLs(baseURL: string, relativeURL: string) {
 
 export const registryLookup=async(lookupParameter:LookupParameter)=>{
     try {
+        console.log("\nLooking Up in registry...!\n")
         const lookupCache=LookupCache.getInstance();
         const cachedResponse=await lookupCache.get(lookupParameter);
         if(cachedResponse){
@@ -25,8 +26,8 @@ export const registryLookup=async(lookupParameter:LookupParameter)=>{
                 const subscriberData=subscriberDetailsSchema.parse(data)
                 subscribers.push(subscriberData);
             } catch (error) {
-                // console.log(data);
-                // console.log(error);
+                console.log(data);
+                console.log(error);
             }
         });
 
