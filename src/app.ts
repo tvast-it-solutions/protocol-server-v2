@@ -10,6 +10,7 @@ import subscribeRouter from './routes/subscribe';
 import { createKeyPair } from "./utils/auth"
 import { generateEncrKeys } from './utils/encryption';
 import { onSubscribe } from './controllers/subscribe';
+import * as cd from './utils/subAuth'
 
 const initializeExpress=async()=>{
     const app = Express()
@@ -41,7 +42,8 @@ const main = async () => {
     try {
         // connectToDb()
         // createKeyPair(); // Ed25519
-        generateEncrKeys() // X25519 
+        // generateEncrKeys() // X25519 
+        cd.generateX25519KeyPair()
         initializeExpress();
     } catch (err) {
         logger.error(err)
