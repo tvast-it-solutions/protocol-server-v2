@@ -16,7 +16,7 @@ export const generateX25519KeyPair = () => {
                 passphrase: 'top secret'
             }
         });
-        console.log(x25519Keys.privateKey.toString());
+        console.log(x25519Keys.privateKey);
         console.log(x25519Keys.publicKey.toString('base64'));
         x25519KeyPair = x25519Keys
         publicKey64 = x25519Keys.publicKey.toString('base64')
