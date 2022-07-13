@@ -1,8 +1,14 @@
-import loadConfig, { getConfiguredActions } from './utils/config'
-import Express, { NextFunction, Request, Response } from "express";
+import Express, { NextFunction, Request, Response } from "express"
+import { WebhookClientConfigDataType, webhookClientSchema } from "./schemas/configs/client.config.schema"
+import { ResponseCache } from "./utils/cache/response.cache.utils"
 
-import logger from './utils/logger';
-import { connectToDb } from "./utils/db";
+import { getConfig } from "./utils/config.utils"
+import logger from "./utils/logger.utils"
+import { MongoUtils } from "./utils/mongo.utils"
+
+const app = Express()
+
+app.use(Express.json())
 
 const initializeExpress=async()=>{
     const app = Express()
@@ -22,9 +28,11 @@ const initializeExpress=async()=>{
         next();
     })
 
-    // Routing.
-    const router=require('./routes/protocol').default;
-    app.use('/', router)
+    // Requests Routing.
+    const {requestsRouter} = require('./routes/requests.routes');
+    app.use('/', requestsRouter);
+
+    // TODO: Response Routing.
 
     // Error Handler.
     app.use((err : any, req : Request, res : Response, next : NextFunction) => {
@@ -41,17 +49,21 @@ const initializeExpress=async()=>{
         })
     })
 
-    app.listen(process.env.PORT, () => {
-        logger.info('Server started on port '+process.env.PORT);
+    const PORT: number = getConfig().port;
+    app.listen(PORT, () => {
+        logger.info('Protocol Server started on PORT : '+PORT);
     })
 }
 
 const main = async () => {
     try {
-        loadConfig();
-        await connectToDb()
-        // createKeyPair();
+        getConfig();
         await initializeExpress();
+        await MongoUtils.getInstance().connect();
+
+        if(MongoUtils.getInstance().isConnected){
+            ResponseCache.getInstance();
+        }
     } catch (err) {
         logger.error(err)
     }
