@@ -43,8 +43,8 @@ app:
   # client and network.
   gateway:
     mode: client
-    inbox-queue: "inbox-queue"
-    outbox-queue: "outbox-queue"
+    inbox-queue: "inbox"
+    outbox-queue: "outbox"
 
   # Mandatory.
   actions:
