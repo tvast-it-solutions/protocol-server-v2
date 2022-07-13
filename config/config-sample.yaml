@@ -1,5 +1,6 @@
 # Mandatory
-port: 5000
+server:
+  port: 5000
 
 # Mandatory.
 cache:
@@ -7,12 +8,11 @@ cache:
   port: 6379
   ttl: "PT10M"
   # Optional. Default is 0.
-  dbNumber: 5
+  db: 1
 
 # Optional.
 responseCache:
-  enabled: true
-  mongoURL: "mongodb://root:password@localhost:27017/protocolServer?authSource=admin"
+  mongoURL: "mongodb://tvast:password@localhost:27017/protocol_server-v2?authSource=admin"
   ttl: "PT10M"
 
 # Mandatory.
@@ -21,15 +21,16 @@ responseCache:
 # 2. webhook
 # 3. pubSub
 client:
-  synchronous: true
+  synchronous: 
+    mongoURL: "mongodb://tvast:password@localhost:27017/protocol_server-v2?authSource=admin"
 
   webhook:
     url: "https://beckn.free.beeceptor.com/clientURL"
   
-  pubSub: 
+  messageQueue: 
     amqpUrl: "amqp://guest:guest@localhost:5672"
-    client-inbox-queue: "bap-protocol-server"
-    client-outbox-queue: "bap-protocol-client"
+    request-queue: "bap-protocol-server"
+    response-queue: "bap-protocol-client"
 
 # TODO: yet to decide Client Auth for requests.
 
@@ -38,15 +39,27 @@ app:
   # Mandatory.
   mode: bap
 
+  # Two types of gateway mode present.
+  # client and network.
+  gateway:
+    mode: client
+    inbox-queue: "inbox-queue"
+    outbox-queue: "outbox-queue"
+
   # Mandatory.
   actions:
     requests:
-      - search
-      - init
+      search:
+        ttl : "PT10S"
+      init:
+        ttl : "PT10S"
     
-    responses:
-      - on_search
-      - on_init
+    responses: 
+      on_search:
+        ttl: "PT10S"
+      
+      on_init:
+        ttl: "PT10S"
   
   # Mandatory.
   privateKey: "your private key"
@@ -69,5 +82,5 @@ app:
   ttl: "PT10M"
 
   # Mandatory.
-  httpTimeout: 3000
+  httpTimeout: "PT3S"
   httpRetryCount: 2
