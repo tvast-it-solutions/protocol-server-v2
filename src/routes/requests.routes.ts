@@ -12,21 +12,11 @@ const isConfigured: Map<RequestActions, boolean> = new Map<RequestActions, boole
 // BAP Configuration.
 if (getConfig().app.mode === AppMode.bap) {
     // All triggers for BAP are defined using request actions.
-    configuredRequestActions.forEach(action => {
-        isConfigured.set(action, true);
-        
-        // TODO: route bapTriggerHandler.
-    });
 }
 
 // BPP Configuration.
 if (getConfig().app.mode === AppMode.bpp) {
     // All requests for BPP are defined using request actions.
-    configuredRequestActions.forEach(action => {
-        isConfigured.set(action, true);
-
-        // TODO: route bppRequestHandler.
-    });
 }
 
 // Unconfigured request actions.

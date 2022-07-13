@@ -28,11 +28,9 @@ client:
     url: "https://beckn.free.beeceptor.com/clientURL"
   
   messageQueue: 
-    amqpUrl: "amqp://guest:guest@localhost:5672"
-    request-queue: "bap-protocol-server"
-    response-queue: "bap-protocol-client"
-
-# TODO: yet to decide Client Auth for requests.
+    amqpURL: "amqp://guest:guest@localhost:5672"
+    incomingQueue: "protocol-server-incoming"
+    outgoingQueue: "protocol-server-outgoing"
 
 # Mandatory.
 app:
@@ -43,8 +41,8 @@ app:
   # client and network.
   gateway:
     mode: client
-    inbox-queue: "inbox"
-    outbox-queue: "outbox"
+    inboxQueue: "inbox"
+    outboxQueue: "outbox"
 
   # Mandatory.
   actions:

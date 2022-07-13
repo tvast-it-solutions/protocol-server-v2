@@ -8,69 +8,108 @@ import { Exception, ExceptionType } from "../../models/exception.model";
 export enum ClientConfigType {
     synchronous = "synchronous",
     webhook = "webhook",
-    pubSub = "pubSub",
+    messageQueue = "messageQueue",
 }
 
-export const syncrhonousClientConfigSchema = z.boolean();
+const syncrhonousClientConfigSchema = z.object({
+    mongoURL: z.string(),
+});
 export type SyncrhonousClientConfigDataType = z.infer<typeof syncrhonousClientConfigSchema>;
+export const parseSynchronousClientConfig = (config: any): SyncrhonousClientConfigDataType => {
+    if(!config){
+        throw new Exception(ExceptionType.Config_SynchronousClientConfig_NotFound, "Synchronous client config not found", 404);
+    }
 
-export const webhookClientSchema = z.object({
+    try {
+        return syncrhonousClientConfigSchema.parse(config);
+    }
+    catch (e) {
+        throw new Exception(ExceptionType.Config_SynchronousClientConfig_Invalid, "Invalid synchronous client config", 400, e);
+    }
+}
+
+const webhookClientSchema = z.object({
     url: z.string(),
 });
 export type WebhookClientConfigDataType = z.infer<typeof webhookClientSchema>;
 
-const pubSubClientSchema = z.object({
-    amqpUrl: z.string(),
-    client_inbox_queue: z.string(),
-    client_outbox_queue: z.string(),
-});
-export type PubSubClientConfigDataType = z.infer<typeof pubSubClientSchema>;
+export const parseWebhookClientConfig = (config: any): WebhookClientConfigDataType => {
+    if(!config){
+        throw new Exception(ExceptionType.Config_WebhookClientConfig_NotFound, "Webhook client config not found", 404);
+    }
 
-export const pubSubClientParser = (config: any): PubSubClientConfigDataType => {
-    const pubSubClientConfig = pubSubClientSchema.parse({
-        amqpUrl: config.amqpUrl,
-        client_inbox_queue: config["client-inbox-queue"],
-        client_outbox_queue: config["client-outbox-queue"],
-    });
-    return pubSubClientConfig;
+    try {
+        return webhookClientSchema.parse(config);
+    }
+    catch (e) {
+        throw new Exception(ExceptionType.Config_WebhookClientConfig_Invalid, "Invalid webhook client config", 400, e);
+    }
+}
+
+const messageQueueClientSchema = z.object({
+    amqpURL: z.string(),
+    incomingQueue: z.string(),
+    outgoingQueue: z.string(),
+});
+
+export type MessageQueueClientConfigDataType = z.infer<typeof messageQueueClientSchema>;
+
+export const parseMessageQueueClientConfig = (config: any): MessageQueueClientConfigDataType => {
+    if(!config){
+        throw new Exception(ExceptionType.Config_MessageQueueClientConfig_NotFound, "Message queue client config not found", 404);
+    }
+
+    try {
+        return messageQueueClientSchema.parse(config);
+    }
+    catch (e) {
+        throw new Exception(ExceptionType.Config_MessageQueueClientConfig_Invalid, "Invalid message queue client config", 400, e);
+    }
 }
 
 export const clientConfigSchema = z.object({
     type: z.nativeEnum(ClientConfigType),
-    // connnection: syncrhonousClientConfigSchema.or(webhookClientSchema).or(pubSubClientSchema)
     connection: z.union([
         syncrhonousClientConfigSchema,
         webhookClientSchema,
-        pubSubClientSchema,
+        messageQueueClientSchema,
     ]),
 });
 
 export type ClientConfigDataType = z.infer<typeof clientConfigSchema>;
 
-export const parseClientConfig = (config: any): any => {
-    let clientConfigType: ClientConfigType|null=null;
-    let connectionConfig: SyncrhonousClientConfigDataType|WebhookClientConfigDataType|PubSubClientConfigDataType|null=null;
-    if(config.synchronous==true){
-        clientConfigType=ClientConfigType.synchronous;
-        connectionConfig=true;
+export const parseClientConfig = (config: any): ClientConfigDataType => {
+    if(!config){
+        throw new Exception(ExceptionType.Config_ClientConfig_NotFound, "Client config not found", 404);
     }
-    else if(config.webhook){
-        clientConfigType=ClientConfigType.webhook;
-        connectionConfig=webhookClientSchema.parse(config.webhook);
+
+    if(Object.keys(config).length === 0){
+        throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Not even one type of Client Configuration is found.", 400);
+    }
+
+    if(Object.keys(config).length>1){
+        throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "More than one type of Client Configuration found.", 400);
+    }
+
+    if(config['synchronous']){
+        return {
+            type: ClientConfigType.synchronous,
+            connection: parseSynchronousClientConfig(config['synchronous']),
+        }
+    }
+    else if(config['webhook']){
+        return {
+            type: ClientConfigType.webhook,
+            connection: parseWebhookClientConfig(config['webhook']),
+        }
+    }
+    else if(config['messageQueue']){
+        return {
+            type: ClientConfigType.messageQueue,
+            connection: parseMessageQueueClientConfig(config['messageQueue']),
+        }
     }
     else{
-        clientConfigType=ClientConfigType.pubSub;
-        connectionConfig=pubSubClientParser(config.pubSub);
+        throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Invalid client config", 400);
     }
-
-    if(!connectionConfig){
-        throw new Exception(ExceptionType.Config_ClientConfigurationInvalid, "Client configuration is invalid", 400);
-    }
-
-    const clientConfig = clientConfigSchema.parse({
-        type: clientConfigType,
-        connection: connectionConfig
-    });
-
-    return clientConfig;
 }

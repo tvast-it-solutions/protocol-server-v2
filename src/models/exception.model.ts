@@ -2,8 +2,38 @@ export enum ExceptionType {
     Cache_NotIntialized = "Cache_NotIntialized",
     
     Config_NotFound = "Config_NotFound",
-    Config_ClientConfigurationInvalid = "Config_ClientConfigurationInvalid",
-    Config_ResponseCacheConfigurationInvalid = "Config_ResponseCacheConfigurationInvalid",
+    
+    Config_ServerConfig_NotFound = "Config_ServerConfig_NotFound",
+    Config_ServerConfig_Invalid = "Config_ServerConfig_Invalid",
+
+    Config_CacheConfig_NotFound = "Config_CacheConfig_NotFound",
+    Config_CacheConfig_Invalid = "Config_CacheConfig_Invalid",
+    
+    Config_ResponseCacheConfig_Invalid = "Config_ResponseCacheConfig_Invalid",
+
+    Config_ClientConfig_NotFound = "Config_ClientConfig_NotFound",
+    Config_ClientConfig_Invalid = "Config_ClientConfig_Invalid",
+
+    Config_SynchronousClientConfig_NotFound="Config_SynchronousClientConfig_NotFound",
+    Config_SynchronousClientConfig_Invalid="Config_SynchronousClientConfig_Invalid",
+
+    Config_WebhookClientConfig_NotFound="Config_WebhookClientConfig_NotFound",
+    Config_WebhookClientConfig_Invalid="Config_WebhookClientConfig_Invalid",
+
+    Config_MessageQueueClientConfig_NotFound="Config_MessageQueueClientConfig_NotFound",
+    Config_MessageQueueClientConfig_Invalid="Config_MessageQueueClientConfig_Invalid",
+
+    Config_GatewayAppConfig_NotFound="Config_GatewayAppConfig_NotFound",
+    Config_GatewayAppConfig_Invalid="Config_GatewayAppConfig_Invalid",
+
+    Config_ActionConfig_Invalid = "Config_ActionConfig_Invalid",
+
+    Config_ActionsAppConfig_NotFound = "Config_ActionsAppConfig_NotFound",
+    Config_ActionsAppConfig_Invalid = "Config_ActionsAppConfig_Invalid",
+
+    Config_AppConfig_NotFound = "Config_AppConfig_NotFound",
+    Config_AppConfig_Invalid = "Config_AppConfig_Invalid",
+
     Config_BPPConfigurationInvalid = "Config_BPPConfigurationInvalid",
     Config_BAPConfigurationInvalid = "Config_BAPConfigurationInvalid",
 
@@ -33,5 +63,9 @@ export class Exception {
         this.code = code;
         this.type=type;
         this.errorData=errorData;
+    }
+
+    toString() {
+        return `${this.type}: ${this.message}\n ${this.errorData}`;
     }
 }

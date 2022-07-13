@@ -1,5 +1,5 @@
 import Express, { NextFunction, Request, Response } from "express"
-import { WebhookClientConfigDataType, webhookClientSchema } from "./schemas/configs/client.config.schema"
+import { Exception } from "./models/exception.model"
 import { ResponseCache } from "./utils/cache/response.cache.utils"
 
 import { getConfig } from "./utils/config.utils"
@@ -49,7 +49,7 @@ const initializeExpress=async()=>{
         })
     })
 
-    const PORT: number = getConfig().port;
+    const PORT: number = getConfig().server.port;
     app.listen(PORT, () => {
         logger.info('Protocol Server started on PORT : '+PORT);
     })
@@ -57,7 +57,7 @@ const initializeExpress=async()=>{
 
 const main = async () => {
     try {
-        getConfig();
+        console.log(getConfig());
         await initializeExpress();
         await MongoUtils.getInstance().connect();
 
@@ -65,7 +65,12 @@ const main = async () => {
             ResponseCache.getInstance();
         }
     } catch (err) {
-        logger.error(err)
+        if(err instanceof Exception){
+            logger.error(err.toString());
+        }
+        else{
+            logger.error(err);
+        }
     }
 }
 
