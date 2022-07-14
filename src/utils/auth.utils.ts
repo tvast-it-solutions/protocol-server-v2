@@ -5,6 +5,7 @@ import { Request, Response } from "express"
 import { getSubscriberDetails } from "./lookup.utils"
 import { Exception, ExceptionType } from "../models/exception.model"
 import { getConfig } from "./config.utils"
+import { SubscriberDetail } from "../schemas/subscriberDetails.schema"
 
 export const createKeyPair = async (): Promise<void> => {
     await _sodium.ready
@@ -90,6 +91,24 @@ const split_auth_header_space = (auth_header: string) => {
         }
     }
     return parts;
+}
+
+// TODO: Add details to the request object or response object using the Authorization header
+export async function getSenderDetails(header: string) : Promise<SubscriberDetail>{
+    try {
+        const parts = split_auth_header(header);
+        if (!parts || Object.keys(parts).length === 0) {
+            throw (new Error("Header parsing failed"));
+        }
+
+        const subscriber_id = parts['keyId'].split('|')[0] as string;
+        const unique_key_id = parts['keyId'].split('|')[1] as string;
+
+        const subscriber_details = await getSubscriberDetails(subscriber_id, unique_key_id);
+        return subscriber_details;
+    } catch (error) {
+        throw error;
+    }
 }
 
 export async function verifyHeader(header: string, req: Request, res: Response) {
