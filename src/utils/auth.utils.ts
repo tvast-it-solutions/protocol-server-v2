@@ -6,7 +6,7 @@ import { getSubscriberDetails } from "./lookup.utils"
 import { Exception, ExceptionType } from "../models/exception.model"
 import { getConfig } from "./config.utils"
 
-export const createKeyPair = async () : Promise<void> => {
+export const createKeyPair = async (): Promise<void> => {
     await _sodium.ready
     const sodium = _sodium
     let { publicKey, privateKey } = sodium.crypto_sign_keypair()
@@ -18,7 +18,7 @@ export const createKeyPair = async () : Promise<void> => {
 
 export const createSigningString = async (message: string, created?: string, expires?: string) => {
     //if (!created) created = Math.floor(new Date().getTime() / 1000).toString();
-    if (!created) created = Math.floor(new Date().getTime() / 1000 - (1*60)).toString(); //TO USE IN CASE OF TIME ISSUE
+    if (!created) created = Math.floor(new Date().getTime() / 1000 - (1 * 60)).toString(); //TO USE IN CASE OF TIME ISSUE
     if (!expires) expires = (parseInt(created) + (1 * 60 * 60)).toString(); //Add required time to create expired
     //const digest = createBlakeHash('blake512').update(JSON.stringify(message)).digest("base64");
     //const digest = blake2.createHash('blake2b', { digestLength: 64 }).update(Buffer.from(message)).digest("base64");
@@ -92,7 +92,7 @@ const split_auth_header_space = (auth_header: string) => {
     return parts;
 }
 
-export async function verifyHeader (header: string, req: Request, res: Response) {
+export async function verifyHeader(header: string, req: Request, res: Response) {
     try {
         const parts = split_auth_header(header);
         if (!parts || Object.keys(parts).length === 0) {

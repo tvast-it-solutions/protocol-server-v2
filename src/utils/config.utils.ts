@@ -3,8 +3,6 @@ import { ConfigDataType, parseConfig } from "../schemas/configs/config.schema";
 
 const config = require("config");
 
-let providedActions: Array<String> = [];
-
 let configuration: ConfigDataType | null;
 
 export const getConfig = (): ConfigDataType => {
