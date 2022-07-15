@@ -16,11 +16,11 @@ export const RequestCacheSchema = z.object({
 export type RequestCacheDataType = z.infer<typeof RequestCacheSchema>;
 
 // Take sender details from the request object
-export const parseRequestCache = (transaction_id: string, message_id: string, sender: SubscriberDetail, gatewayHeader?:string): RequestCacheDataType => {
+export const parseRequestCache = (transaction_id: string, message_id: string, action: string, sender: SubscriberDetail, gatewayHeader?:string): RequestCacheDataType => {
     return RequestCacheSchema.parse({
         transaction_id: transaction_id,
         message_id: message_id,
-        action: RequestActions.search,
+        action: action,
         requestType: ((gatewayHeader)&&(gatewayHeader!="")) ? RequestType.broadcast : RequestType.direct,
         sender: sender
     });

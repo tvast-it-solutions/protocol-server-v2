@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { createAuthHeaderConfig, verifyHeader } from "../utils/auth.utils";
+import { AuthenticatedRequest } from "../interfaces/authenticatedRequest.interface";
+import { createAuthHeaderConfig, getSenderDetails, verifyHeader } from "../utils/auth.utils";
 import logger from "../utils/logger.utils";
 const config = require("config");
 
-export const authValidatorMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authValidatorMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
         console.log("\nNew Request txn_id", req.body?.context?.transaction_id);
         if (req.body?.context?.bap_id) {
@@ -23,6 +24,8 @@ export const authValidatorMiddleware = async (req: Request, res: Response, next:
         }
 
         if (authVerified) {
+            const senderDetails=await getSenderDetails(auth_header);
+            req.sender = senderDetails;
             next();
         }
         else {

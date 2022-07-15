@@ -28,6 +28,10 @@ const initializeExpress=async()=>{
         next();
     })
 
+    // Test Routes
+    const testRouter = require('./routes/test.routes').default;
+    app.use('/test', testRouter);
+
     // Requests Routing.
     const {requestsRouter} = require('./routes/requests.routes');
     app.use('/', requestsRouter);

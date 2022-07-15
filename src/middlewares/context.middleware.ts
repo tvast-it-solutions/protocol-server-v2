@@ -5,6 +5,7 @@ export async function contextMiddleware(req: Request, res: Response, next: NextF
     try {
         const context=buildContext(req.body.context, action);
         req.body.context=context;
+        // TODO: add sender details.
         next();
     } catch (error) {
         next(error);

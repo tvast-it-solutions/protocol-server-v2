@@ -27,15 +27,16 @@ export class RequestCache {
         return key;
     }
 
-    public async cache(request: RequestCacheDataType, ttl:string): Promise<boolean> {
-        const expireSeconds = Moment.duration(ttl).asSeconds();
+    public async cache(request: RequestCacheDataType, ttl:number): Promise<boolean> {
         const key = this.createKey(request.message_id, request.action);
-        const redisResponse = await this.redisClient.setWithExpiry(key, JSON.stringify(request), expireSeconds);
+        console.log(key);
+        const redisResponse = await this.redisClient.setWithExpiry(key, JSON.stringify(request), ttl);
         return redisResponse;
     }
 
     public async check(message_id: string, action: RequestActions|ResponseActions): Promise<RequestCacheDataType | null> {
         const key = this.createKey(message_id, action);
+        console.log(key);
         const redisResponse = await this.redisClient.get(key);
         if (redisResponse) {
             const request = RequestCacheSchema.parse(JSON.parse(redisResponse));
