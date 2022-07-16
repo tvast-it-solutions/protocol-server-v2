@@ -1,11 +1,9 @@
-import { Collection, Db } from "mongodb";
-import { MongoUtils } from "../mongo.utils";
 import moment from "moment";
 import { getConfig } from "../config.utils";
 import { Exception, ExceptionType } from "../../models/exception.model";
+import { DBClient } from "../mongo.utils";
 
 const responseCacheCollection = 'response_cache';
-const generalExpiryDays=1;
 
 export class ResponseCache{
     public static getInstance(): ResponseCache {
@@ -16,17 +14,31 @@ export class ResponseCache{
     }
 
     private static instance: ResponseCache;
-    private db: Db;
+    private dbClient: DBClient;
 
     private constructor() {
-        this.db=MongoUtils.getInstance().getDB();
+        if(!getConfig().responseCache.enabled){
+            throw new Exception(ExceptionType.ResponseCache_NotEnabled, "Response cache is not enabled.", 400);
+        }
+        
+        this.dbClient=new DBClient(getConfig().responseCache.mongoURL!);
         this.createExpireIndex();
+    }
+
+    public async initialize(){
+        if(!getConfig().responseCache.enabled){
+            throw new Exception(ExceptionType.ResponseCache_NotEnabled, "Response cache is not enabled.", 400);
+        }
+        
+        if(!this.dbClient.isConnected){
+            await this.dbClient.connect();
+        }
     }
 
     private async createExpireIndex(){
         // Creating Expire Index.
         try {
-            const collection=this.db.collection(responseCacheCollection);
+            const collection=this.dbClient.getDB().collection(responseCacheCollection);
             const createResult=await collection.createIndex({
                 expiresAt: 1
             }, {
@@ -59,11 +71,11 @@ export class ResponseCache{
             throw new Exception(ExceptionType.ResponseCache_NotEnabled, "Response cache is not enabled.", 400);
         }
 
-        const collection=this.db.collection(responseCacheCollection);
+        const collection=this.dbClient.getDB().collection(responseCacheCollection);
 
         await this.createExpireIndex();
 
-        const expireDate=new Date(Date.now()+(1000*60*60*24*generalExpiryDays));
+        const expireDate=new Date(Date.now()+getConfig().responseCache.ttl!);
         const result=await collection.insertOne({
             expiresAt: expireDate,
             transaction_id: requestBody.context.transaction_id,
@@ -79,7 +91,7 @@ export class ResponseCache{
             throw new Exception(ExceptionType.ResponseCache_NotEnabled, "Response cache is not enabled.", 400);
         }
 
-        const collecton=this.db.collection(responseCacheCollection);
+        const collecton=this.dbClient.getDB().collection(responseCacheCollection);
         
         await this.createExpireIndex();
         
@@ -111,7 +123,7 @@ export class ResponseCache{
             throw new Exception(ExceptionType.ResponseCache_NotEnabled, "Response cache is not enabled.", 400);
         }
 
-        const collection=this.db.collection(responseCacheCollection);
+        const collection=this.dbClient.getDB().collection(responseCacheCollection);
 
         const requestCursor=collection.find({
             parameters: this.createParameters(requestBody),
@@ -132,7 +144,7 @@ export class ResponseCache{
             throw new Exception(ExceptionType.ResponseCache_NotEnabled, "Response cache is not enabled.", 400);
         }
 
-        const collection=this.db.collection(responseCacheCollection);
+        const collection=this.dbClient.getDB().collection(responseCacheCollection);
         await collection.deleteMany({});
     }
 }

@@ -3,8 +3,9 @@ import { getConfig } from "../config.utils";
 import { RedisClient } from "../redis.utils";
 import Moment from 'moment'
 import { RequestActions, ResponseActions } from "../../schemas/configs/actions.app.config.schema";
+import logger from "../logger.utils";
 
-const RequestCacheDB=getConfig().cache.db*10+2;
+const requestCacheDB=getConfig().cache.db*10+2;
 
 export class RequestCache {
     public static getInstance(): RequestCache {
@@ -19,7 +20,11 @@ export class RequestCache {
     private redisClient: RedisClient;
 
     private constructor() {
-        this.redisClient = new RedisClient(RequestCacheDB);
+        this.redisClient = new RedisClient(requestCacheDB);
+    }
+
+    public async initialize() {
+        logger.info("Request Cache Initialized...");
     }
 
     public createKey(message_id: string, action: RequestActions|ResponseActions): string {

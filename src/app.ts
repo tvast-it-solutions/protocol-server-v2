@@ -1,10 +1,15 @@
 import Express, { NextFunction, Request, Response } from "express"
 import { Exception } from "./models/exception.model"
+import { RequestActions } from "./schemas/configs/actions.app.config.schema"
+import { LookupCache } from "./utils/cache/lookup.cache.utils"
+import { RequestCache } from "./utils/cache/request.cache.utils"
 import { ResponseCache } from "./utils/cache/response.cache.utils"
+import { SyncCache } from "./utils/cache/sync.cache.utils"
+import { ClientUtils } from "./utils/client.utils"
 
 import { getConfig } from "./utils/config.utils"
+import { GatewayUtils } from "./utils/gateway.utils"
 import logger from "./utils/logger.utils"
-import { MongoUtils } from "./utils/mongo.utils"
 
 const app = Express()
 
@@ -62,12 +67,17 @@ const initializeExpress=async()=>{
 const main = async () => {
     try {
         console.log(getConfig());
-        await initializeExpress();
-        await MongoUtils.getInstance().connect();
 
-        if(MongoUtils.getInstance().isConnected){
-            ResponseCache.getInstance();
+        await ClientUtils.initializeConnection();
+        await GatewayUtils.initialize();
+        if(getConfig().responseCache.enabled){
+            await ResponseCache.getInstance().initialize();
         }
+        await LookupCache.getInstance().initialize();
+        await RequestCache.getInstance().initialize();
+
+        await initializeExpress();
+        
     } catch (err) {
         if(err instanceof Exception){
             logger.error(err.toString());

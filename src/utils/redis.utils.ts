@@ -1,6 +1,7 @@
 import IORedis from "ioredis";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { getConfig } from "./config.utils";
+import logger from "./logger.utils";
 
 export class RedisClient {
     constructor(db: number=0) {
@@ -17,7 +18,7 @@ export class RedisClient {
             throw new Exception(ExceptionType.Cache_NotIntialized, "Cache is not intialized.", 500, error);
         }
         
-        console.log("Cache Enabled : ", this.cacheEnabled);
+        logger.info(`Redis Client Connected For DB: ${db}`);
     }
 
     private cacheEnabled: boolean;

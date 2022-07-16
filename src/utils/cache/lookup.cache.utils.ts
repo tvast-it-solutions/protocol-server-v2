@@ -3,9 +3,9 @@ import { SubscriberDetail, subscriberDetailsSchema } from "../../schemas/subscri
 import Moment from 'moment'
 import { getConfig } from "../config.utils";
 import { RedisClient } from "../redis.utils";
+import logger from "../logger.utils";
 
 const emptyPlaceHolder = 'N/A';
-const cacheTTL = Moment.duration(getConfig().cache.ttl).asSeconds();
 const lookupCacheDB = getConfig().cache.db*10+1;
 
 export class LookupCache {
@@ -22,6 +22,10 @@ export class LookupCache {
 
     private constructor() {
         this.redisClient = new RedisClient(lookupCacheDB);
+    }
+
+    public async initialize()  {
+        logger.info("Lookup Cache Initialized...");
     }
 
     private createQueryKey(parameters: LookupParameter): string {
@@ -46,7 +50,7 @@ export class LookupCache {
 
     public async cache(parameters: LookupParameter, subscribers: Array<SubscriberDetail>): Promise<boolean> {
         const queryKey = this.createQueryKey(parameters);
-        let expireSeconds=cacheTTL;
+        let expireSeconds=getConfig().cache.ttl;
         subscribers.forEach((subscriber: SubscriberDetail) => {
             const validUntillDate=Date.parse(subscriber.valid_until);
             const currExpireSeconds=validUntillDate-Date.now();
