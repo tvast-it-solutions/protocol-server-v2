@@ -51,6 +51,10 @@ export enum ExceptionType {
 
     ResponseCache_NotEnabled = "ResponseCache_NotEnabled",
     ResponseCache_NotInitialized="ResponseCache_NotInitialized",
+
+    SyncCache_InvalidUse="SyncCache_InvalidUse",
+    SyncCache_NotEnabled = "SyncCache_NotEnabled",
+    SyncCache_NotInitialized="SyncCache_NotInitialized",
 }
 
 export class Exception {
