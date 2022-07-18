@@ -1,60 +1,64 @@
-import { getConfig } from "./config.utils";
+import { connect } from "amqplib";
 import logger from "./logger.utils";
 
-var amqp = require("amqplib/callback_api")
+import client, { Channel } from "amqplib"
 
-let channel : any = null
+interface callbackType { (msg : client.ConsumeMessage | null) : void }
 
-export const initializeConnection = async () => {
-    try {   
-        amqp.connect(getConfig().client.messageQueue.amqpURL, (err : any, conn : any) => {
-            if(err) {
-                logger.error(err)
-            } else {
-                logger.info("Connected to RabbitMQ")
-                conn.createChannel((err1 : any, ch : any) => {
-                    if(err1) {
-                        logger.error(err1)
-                    }
-                    channel = ch
-                })
-            }
+export class MQClient {
+    private channel : Channel | null
+    public isConnected : boolean = false
+
+    constructor() {
+        this.channel = null
+        this.isConnected = false
+    }
+
+    public async connect(url : string) : Promise<void> {
+        connect(url, {
+            heartbeat: 10
         })
-    } catch (err) {
-        logger.error(err);
+        .then(connection => {
+            connection.createChannel()
+            .then(tempChannel => {
+                this.channel = tempChannel
+                this.isConnected = true
+                logger.info(`MQ Client Connected For URL: ${url}`)
+            })
+            .error(err => {
+                throw new Error(err)
+            })
+        })
+        .error(err => {
+            throw new Error(err)
+        })
     }
-}
 
-// Used to Create a Queue. Does nothing if the queue already exists.
-export const assertQueue = async (queueName : string) => {
-    try {
-        if(!channel) {
-            throw new Error("Channel is not initialized")
+    public async assertQueue(queue : string) : Promise<void> {
+        if(!this.channel) {
+            throw new Error("MQ Client is not connected")
         }
-        channel.assertQueue(queueName, { durable: true })
-    } catch (err) {
-        throw err
+        await this.channel.assertQueue(
+            queue,
+            {
+                durable: true
+            }
+        )
     }
-}
 
-export const publishMessage = async (queueName : string, message : string) => {
-    try {
-        if(!channel) {
-            throw new Error("Channel is not initialized")
+    public async publishMessage(queue : string, data : any) {
+        if(!this.channel) {
+            throw new Error("MQ Client is not connected")
         }
-        channel.sendToQueue(queueName, Buffer.from(message))
-    } catch (err) {
-        throw err
+        await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(data)))
     }
-}
 
-export const listenToQueue = async (queueName : string, callback : any) => {
-    try {
-        if(!channel) {
-            throw new Error("Channel is not initialized")
+    public async consumeMessage(queue : string, callback : callbackType) {
+        if(!this.channel) {
+            throw new Error("MQ Client is not connected")
         }
-        channel.consume(queueName, callback, { noAck: true })
-    } catch (err) {
-        throw err
+        this.channel.consume(queue, callback, {
+            noAck: true
+        })
     }
 }
