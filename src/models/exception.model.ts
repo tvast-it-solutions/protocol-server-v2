@@ -55,6 +55,10 @@ export enum ExceptionType {
     SyncCache_InvalidUse="SyncCache_InvalidUse",
     SyncCache_NotEnabled = "SyncCache_NotEnabled",
     SyncCache_NotInitialized="SyncCache_NotInitialized",
+
+    MQ_NotEnabled = "MQ_NotEnabled",
+    MQ_NotInitialized="MQ_NotInitialized",
+    MQ_ConnectionFailed="MQ_ConnectionFailed",
 }
 
 export class Exception {
