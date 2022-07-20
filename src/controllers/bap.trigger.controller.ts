@@ -6,7 +6,7 @@ import { MQClient } from "../utils/rbtmq.utils"
 
 export const bapTriggerHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        new MQClient().publishMessage("outbox", req.body);
+        new MQClient().publishMessage("inbox", req.body);
         res.status(200).json({
             message: {
                 ack: {
