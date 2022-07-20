@@ -10,6 +10,7 @@ export const gatewayAppConfigSchema =z.object({
     mode: z.nativeEnum(GatewayMode),
     inboxQueue: z.string(),
     outboxQueue: z.string(),
+    amqpURL: z.string(),
 });
 
 export type GatewayAppConfigDataType = z.infer<typeof gatewayAppConfigSchema>;

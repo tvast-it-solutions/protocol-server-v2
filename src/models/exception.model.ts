@@ -57,7 +57,7 @@ export enum ExceptionType {
     SyncCache_NotInitialized="SyncCache_NotInitialized",
 
     MQ_NotEnabled = "MQ_NotEnabled",
-    MQ_NotInitialized="MQ_NotInitialized",
+    MQ_ClientNotInitialized="MQ_ClientNotInitialized",
     MQ_ConnectionFailed="MQ_ConnectionFailed",
 }
 

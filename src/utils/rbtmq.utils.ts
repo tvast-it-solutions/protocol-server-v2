@@ -27,7 +27,7 @@ export class MQClient {
             this.channel=tempChannel
             this.isConnected=true
     
-            logger.info(`MQ Client Connected For URL: ${this.amqpUrl}`)
+            logger.info(`MQ Client Connected For: ${this.amqpUrl.split("@")[1].split(":")[0]}`)
         } catch (error) {
             throw new Exception(ExceptionType.MQ_ConnectionFailed, `MQ Client Connection Failed For URL: ${this.amqpUrl}`, 500, error);
         }
@@ -35,7 +35,7 @@ export class MQClient {
 
     public async assertQueue(queue : string) : Promise<void> {
         if(!this.channel) {
-            throw new Error("MQ Client is not connected")
+            throw new Exception(ExceptionType.MQ_ClientNotInitialized, "MQ Client is not connected", 500)
         }
         await this.channel.assertQueue(
             queue,

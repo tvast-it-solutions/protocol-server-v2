@@ -69,7 +69,7 @@ const main = async () => {
         console.log(getConfig());
 
         await ClientUtils.initializeConnection();
-        await GatewayUtils.initialize();
+        await GatewayUtils.getInstance().initialize();
         if(getConfig().responseCache.enabled){
             await ResponseCache.getInstance().initialize();
         }
