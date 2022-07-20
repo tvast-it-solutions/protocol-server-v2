@@ -8,6 +8,7 @@ import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware"
 import { authValidatorMiddleware } from "../middlewares/auth.middleware"
 import { contextMiddleware } from "../middlewares/context.middleware"
 import validator from "../middlewares/validator.middleware"
+import { bapTriggerHandler } from "../controllers/bap.trigger.controller"
 
 export const requestsRouter = Router();
 const configuredRequestActions = getConfig().app.actions.requests;
@@ -30,10 +31,10 @@ let becknRoutes : String[] = [
 // BAP Configuration.
 if (getConfig().app.mode === AppMode.bap) {
     // All triggers for BAP are defined using request actions.
-    if(getConfig().app.gateway.mode === GatewayMode.client) {
+    if(getConfig().app.gateway.mode === GatewayMode.network) {
         // Client Mode
         becknRoutes.forEach(route => {                                      // TODO
-            requestsRouter.post(`/on_${route}`, jsonCompressorMiddleware, contextMiddleware, validator)
+            requestsRouter.post(`/on_${route}`, jsonCompressorMiddleware, authValidatorMiddleware, validator, bapTriggerHandler)
         })
     }
 }
