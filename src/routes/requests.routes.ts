@@ -42,6 +42,11 @@ if (getConfig().app.mode === AppMode.bap) {
 // BPP Configuration.
 if (getConfig().app.mode === AppMode.bpp) {
     // All requests for BPP are defined using request actions.
+    if(getConfig().app.gateway.mode === GatewayMode.network) {
+        Object.keys(RequestActions).forEach(action => {
+            requestsRouter.post(`/${action}`, jsonCompressorMiddleware, validator)
+        })
+    }
 }
 
 // Unconfigured request actions.
