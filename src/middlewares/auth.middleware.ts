@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthenticatedRequest } from "../interfaces/authenticatedRequest.interface";
 import { Locals } from "../interfaces/locals.interface";
 import { createAuthHeaderConfig, getSenderDetails, verifyHeader } from "../utils/auth.utils";
 import logger from "../utils/logger.utils";

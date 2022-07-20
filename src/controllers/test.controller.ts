@@ -1,10 +1,7 @@
-import { NextFunction, Response } from "express";
-import { AuthenticatedRequest } from "../interfaces/authenticatedRequest.interface";
-import { parseRequestCache } from "../schemas/cache/request.cache.schema";
-import { RequestCache } from "../utils/cache/request.cache.utils";
-import { getConfig } from "../utils/config.utils";
+import { NextFunction, Request, Response } from "express";
+import { Locals } from "../interfaces/locals.interface";
 
-export async function testController(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export async function testController(req: Request, res: Response<{}, Locals>, next: NextFunction) {
     
     // // Request Cache Code.
     // const requestCache=RequestCache.getInstance();
@@ -14,7 +11,7 @@ export async function testController(req: AuthenticatedRequest, res: Response, n
     //     req.body.context.transaction_id, 
     //     req.body.context.message_id, 
     //     req.body.context.action,
-    //     req.sender!, 
+    //     res.locals.sender!, 
     //     undefined
     // );
     // const cacheResult=await requestCache.cache(requestData, getConfig().app.actions.requests.init!.ttl);
