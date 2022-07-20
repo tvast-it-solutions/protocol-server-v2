@@ -1,19 +1,14 @@
 import { Request, Response, NextFunction } from "express"
+import { Locals } from "../interfaces/locals.interface";
+import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
 import { MQClient } from "../utils/rbtmq.utils";
 
-// TODO: Code bppResponseHandler()
-
-export const bppClientResponseHandler = (req : Request, res : Response, next : NextFunction) => {
+export const bppClientResponseHandler = async(req : Request, res : Response<{}, Locals>, next : NextFunction, action: ResponseActions) => {
     try {
-        new MQClient().publishMessage("outbox", req.body)
-        res.status(200).json({
-            message: {
-                ack: {
-                    status: "ACK"
-                }
-            }
-        })
+        
     } catch (err) {
-        next(err);
+    
     }
 }
+
+// TODO: create bppClientResponseSettler()

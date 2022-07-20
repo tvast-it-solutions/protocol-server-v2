@@ -1,13 +1,13 @@
-import client from "amqplib"
-import { getConfig } from "../utils/config.utils"
-import logger from "../utils/logger.utils"
+import { NextFunction, Request, Response } from "express"
+import { Locals } from "../interfaces/locals.interface"
+import { ResponseActions } from "../schemas/configs/actions.app.config.schema"
 
-// TODO: code bapResponseHandler
-
-export const bapResponseHandler = async (msg : client.ConsumeMessage | null) => {
+export const bapNetworkResponseHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: ResponseActions) => {
     try {
-        // TODO: code bapResponseHandler
+
     } catch (err) {
-        logger.error(err)
+
     }
 }
+
+// TODO: create bapNetworkResponseSettler()

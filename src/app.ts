@@ -44,9 +44,9 @@ const initializeExpress=async()=>{
     // TODO: Response Routing.
 
     // Error Handler.
-    app.use((err : any, req : Request, res : Response, next : NextFunction) => {
+    app.use((err : Exception, req : Request, res : Response, next : NextFunction) => {
         logger.error(err);
-        res.status(err.status || 500).json({
+        res.status(err.code || 500).json({
             message: {
                 ack:{
                     status: "NACK"

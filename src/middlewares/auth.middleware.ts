@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthenticatedRequest } from "../interfaces/authenticatedRequest.interface";
+import { Locals } from "../interfaces/locals.interface";
 import { createAuthHeaderConfig, getSenderDetails, verifyHeader } from "../utils/auth.utils";
 import logger from "../utils/logger.utils";
 const config = require("config");
 
-export const authValidatorMiddleware = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const authValidatorMiddleware = async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
     try {
         console.log("\nNew Request txn_id", req.body?.context?.transaction_id);
         if (req.body?.context?.bap_id) {
@@ -25,7 +26,7 @@ export const authValidatorMiddleware = async (req: AuthenticatedRequest, res: Re
 
         if (authVerified) {
             const senderDetails=await getSenderDetails(auth_header);
-            req.sender = senderDetails;
+            res.locals.sender = senderDetails;
             next();
         }
         else {
@@ -45,7 +46,7 @@ export const authValidatorMiddleware = async (req: AuthenticatedRequest, res: Re
     }
 }
 
-export async function authCreatorMiddleware(req: Request, res: Response, next: NextFunction) {
+export async function authBuilderMiddleware(req: Request, res: Response<{}, Locals>, next: NextFunction) {
     try {
         const axios_config = await createAuthHeaderConfig(req.body);
         req.headers.authorization = axios_config.headers.authorization;

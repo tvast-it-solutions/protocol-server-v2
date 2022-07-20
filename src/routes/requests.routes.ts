@@ -1,61 +1,52 @@
-import { Router } from "express";
-import { RequestActions } from "../schemas/configs/actions.app.config.schema";
+import { NextFunction, Request, Response, Router } from "express";
+import { RequestActions, ResponseActions } from "../schemas/configs/actions.app.config.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
 import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware"
-import { authValidatorMiddleware } from "../middlewares/auth.middleware"
-import { contextMiddleware } from "../middlewares/context.middleware"
-import validator from "../middlewares/validator.middleware"
-import { bapTriggerHandler } from "../controllers/bap.trigger.controller"
+import { authBuilderMiddleware, authValidatorMiddleware } from "../middlewares/auth.middleware"
+import { contextBuilderMiddleware } from "../middlewares/context.middleware"
+import openApiValidatorMiddleware from "../middlewares/validator.middleware";
+import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
+import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller";
+import { Locals } from "../interfaces/locals.interface";
 
 export const requestsRouter = Router();
-const configuredRequestActions = getConfig().app.actions.requests;
 
-const isConfigured: Map<RequestActions, boolean> = new Map<RequestActions, boolean>();
-
-let becknRoutes : String[] = [
-    "search",
-    "select",
-    "init",
-    "confirm",
-    "status",
-    "track",
-    "cancel",
-    "update",
-    "rating",
-    "support"
-]
-
-// BAP Configuration.
-if (getConfig().app.mode === AppMode.bap) {
-    // All triggers for BAP are defined using request actions.
-    if(getConfig().app.gateway.mode === GatewayMode.network) {
-        // Client Mode
-        becknRoutes.forEach(route => {                                      // TODO
-            requestsRouter.post(`/on_${route}`, jsonCompressorMiddleware, authValidatorMiddleware, validator, bapTriggerHandler)
-        })
-    }
+// BAP Client-Side Gateway Configuration.
+if ((getConfig().app.mode === AppMode.bap)&&(getConfig().app.gateway.mode===GatewayMode.client)) {
+    const requestActions=getConfig().app.actions.requests;
+    Object.keys(RequestActions).forEach(action => {
+        if(requestActions[action as RequestActions]){
+            // requestsRouter.post(`/${action}`, jsonCompressorMiddleware, contextBuilderMiddleware, authBuilderMiddleware, openApiValidatorMiddleware, bapClientTriggerHandler);
+            requestsRouter.post(`/${action}`, jsonCompressorMiddleware, 
+            async (req: Request, res: Response<{}, Locals>, next: NextFunction) =>{
+                await contextBuilderMiddleware(req, res, next, action);
+            }, authBuilderMiddleware, openApiValidatorMiddleware, 
+            async (req: Request, res: Response<{}, Locals>, next: NextFunction) =>{
+                await bapClientTriggerHandler(req, res, next, action as RequestActions);
+            });
+        }
+        else{
+            // TODO: Add to unconfigured.
+        }
+    });
 }
 
-// BPP Configuration.
-if (getConfig().app.mode === AppMode.bpp) {
-    // All requests for BPP are defined using request actions.
-    if(getConfig().app.gateway.mode === GatewayMode.network) {
-        Object.keys(RequestActions).forEach(action => {
-            requestsRouter.post(`/${action}`, jsonCompressorMiddleware, validator)
-        })
-    }
+// BPP Network-Side Gateway Configuration.
+if((getConfig().app.mode==AppMode.bpp)&&(getConfig().app.gateway.mode===GatewayMode.network)){
+    const requestActions=getConfig().app.actions.requests;
+    Object.keys(RequestActions).forEach(action => {
+        if(requestActions[action as RequestActions]){
+            requestsRouter.post(`/${action}`, jsonCompressorMiddleware, 
+            authValidatorMiddleware, openApiValidatorMiddleware, 
+            async (req: Request, res: Response<{}, Locals>, next: NextFunction) =>{
+                await bppNetworkRequestHandler(req, res, next, action as RequestActions);
+            });
+        }
+        else{
+            // TODO: Add to unconfigured.
+        }
+    });
 }
-
-// Unconfigured request actions.
-Object.keys(RequestActions).forEach(action => {
-    if (!isConfigured.has(action as RequestActions)) {
-        isConfigured.set(action as RequestActions, false);
-    }
-
-    if (!isConfigured.get(action as RequestActions)) {
-        // TODO: Add unconfigured request action handling.
-    }
-});

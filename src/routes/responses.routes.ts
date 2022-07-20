@@ -1,40 +1,48 @@
-import { Router } from "express";
+import { NextFunction, Request, Response, Router } from "express";
+import { bapNetworkResponseHandler } from "../controllers/bap.response.controller";
+import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
+import { bppClientResponseHandler } from "../controllers/bpp.response.controller";
+import { authValidatorMiddleware } from "../middlewares/auth.middleware";
+import { contextBuilderMiddleware } from "../middlewares/context.middleware";
+import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware";
+import openApiValidatorMiddleware from "../middlewares/validator.middleware";
 import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
+import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "../utils/config.utils";
 
 export const responsesRouter = Router();
-const configuredResponseActions = getConfig().app.actions.responses;
 
-const isConfigured: Map<ResponseActions, boolean> = new Map<ResponseActions, boolean>();
-
-// BAP Configuration.
-if (getConfig().app.mode === AppMode.bap) {
-    // All response callbacks are defined using response actions.
-    configuredResponseActions.forEach(action => {
-        isConfigured.set(action, true);
-        
-        // TODO: route bapResponseHandler.
+// BAP Network-Side Gateway Configuration.
+if ((getConfig().app.mode === AppMode.bap) && (getConfig().app.gateway.mode === GatewayMode.network)) {
+    const responseActions = getConfig().app.actions.responses;
+    Object.keys(ResponseActions).forEach(action => {
+        if (responseActions[action as ResponseActions]) {
+            responsesRouter.post(`/${action}`, jsonCompressorMiddleware, 
+            authValidatorMiddleware, openApiValidatorMiddleware, 
+            async (req: Request, res: Response, next: NextFunction) => {
+                await bapNetworkResponseHandler(req, res, next, action as ResponseActions);
+            });
+        } else {
+            // TODO: Add to unconfigured.
+        }
     });
 }
 
-// BPP Configuration.
-if (getConfig().app.mode === AppMode.bpp) {
-    // All response apis are defined using response actions.
-    configuredResponseActions.forEach(action => {
-        isConfigured.set(action, true);
-
-        // TODO: route bppResponseHandler.
+// BPP Client-Side Gateway Configuration.
+if ((getConfig().app.mode === AppMode.bpp) && (getConfig().app.gateway.mode === GatewayMode.network)) {
+    const responseActions = getConfig().app.actions.responses;
+    Object.keys(ResponseActions).forEach(action => {
+        if (responseActions[action as ResponseActions]) {
+            responsesRouter.post(`/${action}`, jsonCompressorMiddleware, 
+            async (req: Request, res: Response, next: NextFunction) =>{
+                await contextBuilderMiddleware(req, res, next, action);
+            }, openApiValidatorMiddleware, 
+            async (req: Request, res: Response, next: NextFunction) => {
+                await bppClientResponseHandler(req, res, next, action as ResponseActions);
+            });
+        } else {
+            // TODO: Add to unconfigured.
+        }
     });
 }
-
-// Unconfigured response actions.
-Object.keys(ResponseActions).forEach(action => {
-    if (!isConfigured.has(action as ResponseActions)) {
-        isConfigured.set(action as ResponseActions, false);
-    }
-
-    if (!isConfigured.get(action as ResponseActions)) {
-        // TODO: Add unconfigured response action handling.
-    }
-});
