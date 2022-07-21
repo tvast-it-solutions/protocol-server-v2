@@ -1,14 +1,13 @@
 import * as AmqbLib from "amqplib";
 import logger from "./logger.utils";
 
-import client, { Channel } from "amqplib"
 import { Exception, ExceptionType } from "../models/exception.model";
 
-interface callbackType { (msg : client.ConsumeMessage | null) : void }
+interface callbackType { (msg : AmqbLib.ConsumeMessage | null) : void }
 
 export class MQClient {
     private amqpUrl : string
-    private channel : Channel | null
+    private channel : AmqbLib.Channel | null
     public isConnected : boolean = false
 
     constructor(amqpUrl : string) {
