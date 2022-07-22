@@ -66,8 +66,11 @@ export enum ExceptionType {
 
     Client_CallbackFailed="Client_CallbackFailed",
     Client_MessageQueueFailed="Client_MessageQueueFailed",
+    Client_SendSyncReponsesFailed="Client_SendSyncReponsesFailed",
+    Client_SyncCacheDataNotFound="Client_SyncCacheDataNotFound",
 
-    Acknowledgement_Failed="Acknowledgement_Failed"
+    Acknowledgement_Failed="Acknowledgement_Failed",
+
 }
 
 export class Exception {
