@@ -63,9 +63,11 @@ export enum ExceptionType {
     Gateway_InvalidUse="Gateway_InvalidUse",
 
     Client_InvalidCall="Client_InvalidCall",
-    
+
     Client_CallbackFailed="Client_CallbackFailed",
     Client_MessageQueueFailed="Client_MessageQueueFailed",
+
+    Acknowledgement_Failed="Acknowledgement_Failed"
 }
 
 export class Exception {
