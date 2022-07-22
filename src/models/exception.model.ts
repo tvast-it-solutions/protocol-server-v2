@@ -61,6 +61,11 @@ export enum ExceptionType {
     MQ_ConnectionFailed="MQ_ConnectionFailed",
 
     Gateway_InvalidUse="Gateway_InvalidUse",
+
+    Client_InvalidCall="Client_InvalidCall",
+    
+    Client_CallbackFailed="Client_CallbackFailed",
+    Client_MessageQueueFailed="Client_MessageQueueFailed",
 }
 
 export class Exception {
