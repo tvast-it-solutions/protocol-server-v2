@@ -1,21 +1,14 @@
 import { z } from "zod";
+import { becknErrorSchema } from "../becknError.schema";
 import { RequestActions } from "../configs/actions.app.config.schema";
 
-const syncErrorSchema = z.object({
-    type: z.string(),
-    code: z.number(),
-    path: z.string().optional(),
-    message: z.string(),
-    data: z.array(z.any()).optional()
-});
-
-export type SyncErrorDataType = z.infer<typeof syncErrorSchema>;
+export type BecknErrorDataType = z.infer<typeof becknErrorSchema>;
 
 export const syncCacheSchema = z.object({
     message_id: z.string(),
     action: z.nativeEnum(RequestActions),
     responses: z.array(z.any()),
-    error: syncErrorSchema.optional()
+    error: becknErrorSchema.optional()
 }); 
 
 export type SyncCacheDataType = z.infer<typeof syncCacheSchema>;

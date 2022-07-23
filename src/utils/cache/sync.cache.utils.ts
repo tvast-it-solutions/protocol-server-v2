@@ -1,6 +1,6 @@
 import { Db } from "mongodb";
 import { Exception, ExceptionType } from "../../models/exception.model";
-import { SyncCacheDataType, syncCacheSchema, SyncErrorDataType } from "../../schemas/cache/sync.cache.schema";
+import { BecknErrorDataType, SyncCacheDataType, syncCacheSchema } from "../../schemas/cache/sync.cache.schema";
 import { RequestActions } from "../../schemas/configs/actions.app.config.schema";
 import { ClientConfigType, SyncrhonousClientConfigDataType } from "../../schemas/configs/client.config.schema";
 import { getConfig } from "../config.utils";
@@ -77,7 +77,7 @@ export class SyncCache {
         });
     }
 
-    public async recordError(message_id: string, action: RequestActions, error: SyncErrorDataType) {
+    public async recordError(message_id: string, action: RequestActions, error: BecknErrorDataType) {
         if(getConfig().client.type != ClientConfigType.synchronous){
             throw new Exception(ExceptionType.SyncCache_InvalidUse, "Sync Cache should be used only in case the client connection mode is synchronous.", 400);
         }

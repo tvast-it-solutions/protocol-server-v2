@@ -41,7 +41,9 @@ const initializeExpress=async()=>{
     const {requestsRouter} = require('./routes/requests.routes');
     app.use('/', requestsRouter);
 
-    // TODO: Response Routing.
+    // Response Routing.
+    const {responsesRouter} = require('./routes/responses.routes');
+    app.use('/', responsesRouter);
 
     // Error Handler.
     app.use((err : Exception, req : Request, res : Response, next : NextFunction) => {

@@ -11,6 +11,7 @@ import openApiValidatorMiddleware from "../middlewares/validator.middleware";
 import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
 import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller";
 import { Locals } from "../interfaces/locals.interface";
+import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 
 export const requestsRouter = Router();
 
@@ -29,7 +30,9 @@ if ((getConfig().app.mode === AppMode.bap)&&(getConfig().app.gateway.mode===Gate
             });
         }
         else{
-            // TODO: Add to unconfigured.
+            requestsRouter.post(`/${action}`, async(req: Request, res: Response, next: NextFunction) => {
+                await unConfigureActionHandler(req, res, next, action);
+            });
         }
     });
 }
@@ -46,7 +49,9 @@ if((getConfig().app.mode==AppMode.bpp)&&(getConfig().app.gateway.mode===GatewayM
             });
         }
         else{
-            // TODO: Add to unconfigured.
+            requestsRouter.post(`/${action}`, async(req: Request, res: Response, next: NextFunction) => {
+                await unConfigureActionHandler(req, res, next, action);
+            });
         }
     });
 }

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { bapNetworkResponseHandler } from "../controllers/bap.response.controller";
-import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
 import { bppClientResponseHandler } from "../controllers/bpp.response.controller";
+import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 import { authValidatorMiddleware } from "../middlewares/auth.middleware";
 import { contextBuilderMiddleware } from "../middlewares/context.middleware";
 import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware";
@@ -24,7 +24,9 @@ if ((getConfig().app.mode === AppMode.bap) && (getConfig().app.gateway.mode === 
                 await bapNetworkResponseHandler(req, res, next, action as ResponseActions);
             });
         } else {
-            // TODO: Add to unconfigured.
+            responsesRouter.post(`/${action}`, async(req: Request, res: Response, next: NextFunction) => {
+                await unConfigureActionHandler(req, res, next, action);
+            });
         }
     });
 }
@@ -42,7 +44,9 @@ if ((getConfig().app.mode === AppMode.bpp) && (getConfig().app.gateway.mode === 
                 await bppClientResponseHandler(req, res, next, action as ResponseActions);
             });
         } else {
-            // TODO: Add to unconfigured.
+            responsesRouter.post(`/${action}`, async(req: Request, res: Response, next: NextFunction) => {
+                await unConfigureActionHandler(req, res, next, action);
+            });
         }
     });
 }

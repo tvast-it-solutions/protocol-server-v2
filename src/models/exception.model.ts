@@ -71,6 +71,7 @@ export enum ExceptionType {
 
     Acknowledgement_Failed="Acknowledgement_Failed",
 
+    Request_Failed="Request_Failed"
 }
 
 export class Exception {

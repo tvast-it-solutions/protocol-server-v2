@@ -1,7 +1,8 @@
 import { response, Response } from "express";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { contextAcknowledgementSchema } from "../schemas/acknowledgement/context.acknowledgement.schema";
-import { errorAcknowledgementSchema } from "../schemas/acknowledgement/error.acknowledgement.schema";
+import { becknErrorSchema } from "../schemas/becknError.schema";
+import { BecknErrorDataType } from "../schemas/cache/sync.cache.schema";
 
 function acknowledge(res: Response, data: any){
     try {
@@ -35,9 +36,9 @@ export function acknowledgeACK(res: Response, context:any) {
     }
 }
 
-export function acknowledgeNACK(res: Response, context:any, error: any){
+export function acknowledgeNACK(res: Response, context:any, error: BecknErrorDataType){
     try {
-        const errorData=errorAcknowledgementSchema.parse(error);
+        const errorData=becknErrorSchema.parse(error);
         const contextData=contextAcknowledgementSchema.parse(context);
         acknowledge(res, {
             "context": contextData,
