@@ -38,7 +38,7 @@ export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Lo
         }
 
         await RequestCache.getInstance().cache(parseRequestCache(req.body.context.transaction_id, req.body.context.message_id, action, res.locals.sender!), getConfig().app.actions.requests[action]?.ttl!);
-        GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
+        await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
 
         if(getConfig().client.type==ClientConfigType.synchronous){
             sendSyncResponses(res, req.body.context.message_id, action, req.body.context);
