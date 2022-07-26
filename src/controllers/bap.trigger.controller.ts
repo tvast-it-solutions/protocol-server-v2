@@ -26,6 +26,7 @@ export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Lo
         const bpp_uri: string | undefined=req.body.context.bpp_uri;
         if((action!=RequestActions.search)&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
             acknowledgeNACK(res, req.body.context, {
+                // TODO: change the error code.
                 code: 6781616,
                 message: "All triggers other than search requires bpp_id and bpp_uri. \nMissing bpp_id or bpp_uri",
                 type: BecknErrorType.contextError,
@@ -93,7 +94,7 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
             case ClientConfigType.synchronous:{
                 const message_id=requestBody.context.message_id;
                 await SyncCache.getInstance().recordError(message_id, action as RequestActions, {
-                    // TODO: change this code.
+                    // TODO: change this error code.
                     code: 651641,
                     type: BecknErrorType.coreError,
                     message: "Network Participant Request Failed...",
@@ -107,7 +108,7 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
             }
             case ClientConfigType.webhook:{
                 await errorCallback({
-                    // TODO: change this code.
+                    // TODO: change this error code.
                     code: 651641,
                     type: BecknErrorType.coreError,
                     message: "Network Participant Request Failed...",

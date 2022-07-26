@@ -1,8 +1,7 @@
 import { RequestCacheDataType, RequestCacheSchema } from "../../schemas/cache/request.cache.schema";
 import { getConfig } from "../config.utils";
 import { RedisClient } from "../redis.utils";
-import Moment from 'moment'
-import { RequestActions, ResponseActions } from "../../schemas/configs/actions.app.config.schema";
+import { RequestActions } from "../../schemas/configs/actions.app.config.schema";
 import logger from "../logger.utils";
 
 const requestCacheDB=getConfig().cache.db*10+2;
@@ -27,7 +26,7 @@ export class RequestCache {
         logger.info("Request Cache Initialized...");
     }
 
-    public createKey(message_id: string, action: RequestActions|ResponseActions): string {
+    public createKey(message_id: string, action: RequestActions): string {
         const key = `${action}_${message_id}`;
         return key;
     }
@@ -39,7 +38,7 @@ export class RequestCache {
         return redisResponse;
     }
 
-    public async check(message_id: string, action: RequestActions|ResponseActions): Promise<RequestCacheDataType | null> {
+    public async check(message_id: string, action: RequestActions): Promise<RequestCacheDataType | null> {
         const key = this.createKey(message_id, action);
         console.log(key);
         const redisResponse = await this.redisClient.get(key);
@@ -51,7 +50,7 @@ export class RequestCache {
         return null;
     }
 
-    public async delete(message_id: string, action: RequestActions|ResponseActions): Promise<boolean> {
+    public async delete(message_id: string, action: RequestActions): Promise<boolean> {
         const redisResponse = await this.redisClient.delete(message_id);
         return redisResponse;
     }

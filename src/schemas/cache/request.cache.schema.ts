@@ -5,10 +5,7 @@ import { NetworkPaticipantType, SubscriberDetail, subscriberDetailsSchema } from
 export const RequestCacheSchema = z.object({
     transaction_id: z.string(),
     message_id: z.string(),
-    action: z.union([
-        z.nativeEnum(RequestActions),
-        z.nativeEnum(ResponseActions)
-    ]),
+    action: z.nativeEnum(RequestActions),
     requestType: z.nativeEnum(RequestType),
     sender: subscriberDetailsSchema
 });
