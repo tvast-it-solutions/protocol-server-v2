@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { becknErrorSchema } from "../schemas/becknError.schema";
+import { BecknErrorDataType } from "../schemas/cache/sync.cache.schema";
 import { requestCallbackSchema } from "../schemas/callbacks/request.callback.schema";
 import { responseCallbackSchema } from "../schemas/callbacks/response.callback.schema";
 import { ClientConfigType, WebhookClientConfigDataType } from "../schemas/configs/client.config.schema";
@@ -54,10 +55,9 @@ export async function requestCallback(data: any){
     }
 }
 
-export async function errorCallback(data: any){
+export async function errorCallback(data: BecknErrorDataType){
     try {
-        const callbackData=becknErrorSchema.parse(data);
-        await makeClientCallback(callbackData);
+        await makeClientCallback(data);
     } catch (error) {
         if (error instanceof Exception) {
             throw error;

@@ -58,6 +58,3 @@ export const bppNetworkRequestSettler = async (msg: AmqbLib.ConsumeMessage | nul
         logger.error(err)
     }
 }
-
-
-// TODO: create bppNetworkRequestSettler()

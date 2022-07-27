@@ -93,7 +93,7 @@ const split_auth_header_space = (auth_header: string) => {
     return parts;
 }
 
-// TODO: Add details to the request object or response object using the Authorization header
+
 export async function getSenderDetails(header: string) : Promise<SubscriberDetail>{
     try {
         const parts = split_auth_header(header);

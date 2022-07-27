@@ -103,7 +103,7 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
                 break;
             }
             case ClientConfigType.messageQueue:{
-                // TODO: send it to the client-side application using message queue.
+                // TODO: Implement message queue.
                 break;
             }
             case ClientConfigType.webhook:{
