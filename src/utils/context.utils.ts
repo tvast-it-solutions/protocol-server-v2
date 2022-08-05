@@ -10,7 +10,7 @@ export function buildContext(context: any, action: string) {
     let transaction_id = uuid_v4();
     if(getConfig().app.mode==AppMode.bpp){
         if(!context.message_id){
-            throw new Exception(ExceptionType.OpenApiSchema_ParsingError, "Message id is missing.", 400, [
+            throw new Exception(ExceptionType.OpenApiSchema_ParsingError, "Message id is missing in BPP Mode.", 400, [
                 {
                     error: "body.context.message_id is missing",
                     path: "body.context.message_id"
@@ -20,7 +20,7 @@ export function buildContext(context: any, action: string) {
         message_id=context.message_id as string;
 
         if(!context.transaction_id){
-            throw new Exception(ExceptionType.OpenApiSchema_ParsingError, "Transaction id is missing.", 400, [
+            throw new Exception(ExceptionType.OpenApiSchema_ParsingError, "Transaction id is missing in BPP Mode.", 400, [
                 {
                     error: "body.context.transaction_id is missing",
                     path: "body.context.transaction_id"
