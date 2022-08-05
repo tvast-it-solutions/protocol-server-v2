@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { becknContextSchema } from "../becknContext.schema";
 
 export const requestCallbackSchema = z.object({
-    context: z.object({}),
+    context: becknContextSchema,
     message: z.object({}),
 });
 

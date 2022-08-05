@@ -1,12 +1,12 @@
 import { response, Response } from "express";
 import { Exception, ExceptionType } from "../models/exception.model";
-import { contextAcknowledgementSchema } from "../schemas/acknowledgement/context.acknowledgement.schema";
+import { becknContextSchema } from "../schemas/becknContext.schema";
 import { becknErrorSchema } from "../schemas/becknError.schema";
 import { BecknErrorDataType } from "../schemas/cache/sync.cache.schema";
 
 function acknowledge(res: Response, data: any){
     try {
-        response.status(202).json(data);        
+        res.status(202).json(data);
     } catch (error) {
         if(error instanceof Exception){
             throw error;
@@ -18,7 +18,7 @@ function acknowledge(res: Response, data: any){
 
 export function acknowledgeACK(res: Response, context:any) {
     try {
-        const contextData=contextAcknowledgementSchema.parse(context);
+        const contextData=becknContextSchema.parse(context);
         acknowledge(res, {
             "context": contextData,
             "message": {
@@ -39,7 +39,7 @@ export function acknowledgeACK(res: Response, context:any) {
 export function acknowledgeNACK(res: Response, context:any, error: BecknErrorDataType){
     try {
         const errorData=becknErrorSchema.parse(error);
-        const contextData=contextAcknowledgementSchema.parse(context);
+        const contextData=becknContextSchema.parse(context);
         acknowledge(res, {
             "context": contextData,
             "message": {
