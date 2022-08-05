@@ -14,6 +14,7 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { createAuthHeaderConfig } from "../utils/auth.utils";
 import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
+import { ActionUtils } from "../utils/actions.utils";
 
 export const bppClientResponseHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: ResponseActions) => {
     try {
@@ -31,10 +32,10 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
     try {
         const responseBody=JSON.parse(msg?.content.toString()!);
         const message_id=responseBody.context.message_id;
-        const action=responseBody.context.action as RequestActions;
+        const action=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
         const bap_uri=responseBody.context.bap_uri;
 
-        // Working fine till here.
+        console.log(action, message_id);
         const requestCache=await RequestCache.getInstance().check(message_id, action);
         if(!requestCache){
             errorCallback({
