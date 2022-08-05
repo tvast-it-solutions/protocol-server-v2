@@ -33,14 +33,12 @@ export class RequestCache {
 
     public async cache(request: RequestCacheDataType, ttl:number): Promise<boolean> {
         const key = this.createKey(request.message_id, request.action);
-        console.log(key);
         const redisResponse = await this.redisClient.setWithExpiry(key, JSON.stringify(request), ttl);
         return redisResponse;
     }
 
     public async check(message_id: string, action: RequestActions): Promise<RequestCacheDataType | null> {
         const key = this.createKey(message_id, action);
-        console.log(key);
         const redisResponse = await this.redisClient.get(key);
         if (redisResponse) {
             const request = RequestCacheSchema.parse(JSON.parse(redisResponse));

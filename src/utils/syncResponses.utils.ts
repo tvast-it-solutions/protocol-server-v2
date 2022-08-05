@@ -13,8 +13,10 @@ export async function sendSyncResponses(res: Response, message_id:string, action
 
         const syncCache=SyncCache.getInstance();
         syncCache.initCache(message_id, action);
+        
         const waitTime=(getConfig().app.actions.requests[action]?.ttl) ? getConfig().app.actions.requests[action]?.ttl! : 30*1000;
         await sleep(waitTime);
+        
         const syncCacheData=await syncCache.getData(message_id, action);
         if(!syncCacheData){
             throw new Exception(ExceptionType.Client_SyncCacheDataNotFound, `Sync cache data not found for message_id: ${message_id} and action: ${action}`, 404);
@@ -29,8 +31,8 @@ export async function sendSyncResponses(res: Response, message_id:string, action
         }
 
         res.status(200).json({
-            context: context,
-            responses: syncCacheData.responses,
+            context,
+            responses: syncCacheData.responses
         });
     } catch (error) {
         if(error instanceof Exception){

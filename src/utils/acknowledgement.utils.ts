@@ -1,8 +1,7 @@
 import { response, Response } from "express";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { becknContextSchema } from "../schemas/becknContext.schema";
-import { becknErrorSchema } from "../schemas/becknError.schema";
-import { BecknErrorDataType } from "../schemas/cache/sync.cache.schema";
+import { BecknErrorDataType, becknErrorSchema } from "../schemas/becknError.schema";
 
 function acknowledge(res: Response, data: any){
     try {

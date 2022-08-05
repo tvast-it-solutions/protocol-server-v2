@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Exception, ExceptionType } from "../models/exception.model";
-import { becknErrorSchema } from "../schemas/becknError.schema";
-import { BecknErrorDataType } from "../schemas/cache/sync.cache.schema";
+import { BecknErrorDataType, becknErrorSchema } from "../schemas/becknError.schema";
 import { requestCallbackSchema } from "../schemas/callbacks/request.callback.schema";
 import { responseCallbackSchema } from "../schemas/callbacks/response.callback.schema";
 import { ClientConfigType, WebhookClientConfigDataType } from "../schemas/configs/client.config.schema";

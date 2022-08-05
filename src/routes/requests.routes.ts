@@ -7,7 +7,7 @@ import logger from "../utils/logger.utils";
 import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware"
 import { authBuilderMiddleware, authValidatorMiddleware } from "../middlewares/auth.middleware"
 import { contextBuilderMiddleware } from "../middlewares/context.middleware"
-import openApiValidatorMiddleware from "../middlewares/validator.middleware";
+import openApiValidatorMiddleware from "../middlewares/schemaValidator.middleware";
 import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
 import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller";
 import { Locals } from "../interfaces/locals.interface";

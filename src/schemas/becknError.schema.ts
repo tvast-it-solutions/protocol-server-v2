@@ -14,3 +14,5 @@ export const becknErrorSchema=z.object({
     message: z.string(),
     data: z.array(z.any()).optional()
 });
+
+export type BecknErrorDataType=z.infer<typeof becknErrorSchema>;

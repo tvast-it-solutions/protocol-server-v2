@@ -5,7 +5,7 @@ import { unConfigureActionHandler } from "../controllers/unconfigured.controller
 import { authValidatorMiddleware } from "../middlewares/auth.middleware";
 import { contextBuilderMiddleware } from "../middlewares/context.middleware";
 import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware";
-import openApiValidatorMiddleware from "../middlewares/validator.middleware";
+import openApiValidatorMiddleware from "../middlewares/schemaValidator.middleware";
 import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";

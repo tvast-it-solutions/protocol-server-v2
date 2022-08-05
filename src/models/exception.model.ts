@@ -71,7 +71,9 @@ export enum ExceptionType {
 
     Acknowledgement_Failed="Acknowledgement_Failed",
 
-    Request_Failed="Request_Failed"
+    Request_Failed="Request_Failed",
+
+    OpenApiSchema_ParsingError="OpenApiSchema_ParsingError",
 }
 
 export class Exception {
