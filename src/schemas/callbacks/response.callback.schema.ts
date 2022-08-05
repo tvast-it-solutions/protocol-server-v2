@@ -4,7 +4,7 @@ import { becknErrorSchema } from "../becknError.schema";
 
 export const responseCallbackSchema = z.object({
     context: becknContextSchema,
-    message: z.object({}),
+    message: z.any(),
     error: becknErrorSchema,
 });
 

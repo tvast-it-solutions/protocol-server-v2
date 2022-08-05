@@ -19,12 +19,20 @@ async function makeClientCallback(data:any){
 
         const clientConnectionConfig=getConfig().client.connection as WebhookClientConfigDataType;
         const response=await axios.post(clientConnectionConfig.url, data);
-    } catch (error) {
+    } catch (error : any) {
         if (error instanceof Exception) {
             throw error;
         }
 
-        throw new Exception(ExceptionType.Client_CallbackFailed, "Callback to client failed.", 500, error);
+        if(error.response){
+            throw new Exception(ExceptionType.Client_CallbackFailed, "Callback to client failed.", error.response.status, error.response.data);
+        }
+        else if(error.request){
+            throw new Exception(ExceptionType.Client_CallbackFailed, "Callback to client failed.", 500, error.request);
+        }
+        else{
+            throw new Exception(ExceptionType.Client_CallbackFailed, "Callback to client failed.", 500, error);
+        }
     }
 }
 

@@ -13,12 +13,7 @@ const openApiValidator = OpenApiValidator.middleware({
 
 const schemaErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
     console.log(err.data)
-    const errorData = {
-        code: err.status,
-        message: "OpenApiValidator Error",
-        data: err,
-        type: ExceptionType.OpenApiSchema_ParsingError
-    } as Exception;
+    const errorData=new Exception(ExceptionType.OpenApiSchema_ParsingError, "OpenApiValidator Error", 400, err);
     next(errorData);
 }
 

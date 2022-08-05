@@ -76,12 +76,13 @@ export enum ExceptionType {
     OpenApiSchema_ParsingError="OpenApiSchema_ParsingError",
 }
 
-export class Exception {
+export class Exception extends Error {
     message: string;
     code: number;
     type: ExceptionType;
     errorData?: any;
     constructor(type: ExceptionType, message: string, code: number, errorData?: any) {
+        super(`${type}: ${message}\n ${errorData}`);
         this.message = message;
         this.code = code;
         this.type=type;
