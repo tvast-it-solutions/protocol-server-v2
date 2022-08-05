@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { Locals } from "../interfaces/locals.interface";
+import { AppMode } from "../schemas/configs/app.config.schema";
+import { NetworkPaticipantType } from "../schemas/subscriberDetails.schema";
 import { createAuthHeaderConfig, getSenderDetails, verifyHeader } from "../utils/auth.utils";
+import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
 const config = require("config");
 
@@ -49,6 +52,13 @@ export async function authBuilderMiddleware(req: Request, res: Response<{}, Loca
     try {
         const axios_config = await createAuthHeaderConfig(req.body);
         req.headers.authorization = axios_config.headers.authorization;
+        res.locals.sender={
+            signing_public_key: getConfig().app.publicKey,
+            subscriber_id: getConfig().app.subscriberId,
+            subscriber_url: getConfig().app.subscriberUri,
+            type: getConfig().app.mode==AppMode.bap ? NetworkPaticipantType.BAP : NetworkPaticipantType.BPP,
+            valid_until: new Date(new Date().getTime()+1000*60*60*24*30).toISOString()
+        }
         next();
     } catch (error) {
         next(error)
