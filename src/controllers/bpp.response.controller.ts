@@ -45,6 +45,7 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
             return;
         }
 
+        console.log(responseBody);
         const axios_config = await createAuthHeaderConfig(responseBody);
         
         let response:BecknResponse|null=null;
