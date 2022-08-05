@@ -85,7 +85,6 @@ const initializeExpress=async()=>{
 
 const main = async () => {
     try {
-        console.log(getConfig());
 
         await ClientUtils.initializeConnection();
         await GatewayUtils.getInstance().initialize();

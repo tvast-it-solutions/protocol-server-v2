@@ -23,7 +23,6 @@ export const bppNetworkRequestHandler = async (req: Request, res: Response<{}, L
         const transaction_id=req.body.context.transaction_id;
         const ttl=moment.duration(req.body.context.ttl).asMilliseconds();
 
-        console.log(action, message_id);
         await RequestCache.getInstance().cache(parseRequestCache(transaction_id, message_id, action, res.locals.sender!), ttl);
 
         await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
