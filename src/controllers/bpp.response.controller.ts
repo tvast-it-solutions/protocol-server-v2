@@ -37,6 +37,7 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
         const action=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
         const bap_uri=responseBody.context.bap_uri;
 
+        console.log(action, message_id);
         const requestCache=await RequestCache.getInstance().check(message_id, action);
         if(!requestCache){
             errorCallback(context, {

@@ -52,12 +52,12 @@ export const bppContextBuilder = (context: any, action: string)  : BecknContextD
     if(!context.core_version){
         throw new Exception(ExceptionType.Context_CoreVersionNotFound, "Core version not found in the context", 404);
     }
-    // if(!context.transaction_id){
-    //     throw new Exception(ExceptionType.Context_TransactionIdNotFound, "transaction_id not found in the context", 404);
-    // }
-    // if(!context.message_id){
-    //     throw new Exception(ExceptionType.Context_MessageIdNotFound, "message_id not found in the context", 404);
-    // }
+    if(!context.transaction_id){
+        throw new Exception(ExceptionType.Context_TransactionIdNotFound, "transaction_id not found in the context", 404);
+    }
+    if(!context.message_id){
+        throw new Exception(ExceptionType.Context_MessageIdNotFound, "message_id not found in the context", 404);
+    }
 
     const bppContext : BecknContextDataType={
         domain: context.domain,
