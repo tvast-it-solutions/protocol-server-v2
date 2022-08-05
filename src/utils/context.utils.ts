@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { v4 as uuid_v4 } from 'uuid';
 import { Exception, ExceptionType } from '../models/exception.model';
 import { getConfig } from './config.utils';
@@ -15,6 +16,7 @@ export function buildContext(context: any, action: string) {
         throw new Exception(ExceptionType.Context_DomainNotFound, "Domain not found in the context", 404);
     }
 
+    const ttl=moment.duration(getConfig().cache.ttl, 'ms').toISOString();
     const bapContext = {
         domain: context.domain,
         country: (context.country) ? context.country : getConfig().app.country,
@@ -26,7 +28,7 @@ export function buildContext(context: any, action: string) {
         
         transaction_id: transaction_id,
         message_id: message_id,
-        ttl: getConfig().app.ttl,
+        ttl: ttl,
         timestamp: timestamp,
         bap_id: getConfig().app.subscriberId,
         bap_uri: getConfig().app.subscriberUri,
