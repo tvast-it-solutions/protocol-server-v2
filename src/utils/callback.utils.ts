@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Exception, ExceptionType } from "../models/exception.model";
+import { BecknContextDataType } from "../schemas/becknContext.schema";
 import { BecknErrorDataType, becknErrorSchema } from "../schemas/becknError.schema";
 import { requestCallbackSchema } from "../schemas/callbacks/request.callback.schema";
 import { responseCallbackSchema } from "../schemas/callbacks/response.callback.schema";
@@ -58,9 +59,12 @@ export async function requestCallback(data: any){
     }
 }
 
-export async function errorCallback(data: BecknErrorDataType){
+export async function errorCallback(context:BecknContextDataType, error: BecknErrorDataType){
     try {
-        await makeClientCallback(data);
+        await makeClientCallback({
+            context: context,
+            error: error
+        });
     } catch (error) {
         if (error instanceof Exception) {
             throw error;

@@ -19,6 +19,7 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { errorCallback } from "../utils/callback.utils";
+import { becknContextSchema } from "../schemas/becknContext.schema";
 
 export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: RequestActions) => {
     try {
@@ -56,6 +57,7 @@ export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Lo
 export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | null) => {
     try {
         const requestBody=JSON.parse(message?.content.toString()!);
+        const context=becknContextSchema.parse(requestBody.context);
         const axios_config = await createAuthHeaderConfig(requestBody);
         
         const bpp_id= requestBody.context.bpp_id;
@@ -107,7 +109,7 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
                 break;
             }
             case ClientConfigType.webhook:{
-                await errorCallback({
+                await errorCallback(context, {
                     // TODO: change this error code.
                     code: 651641,
                     type: BecknErrorType.coreError,
