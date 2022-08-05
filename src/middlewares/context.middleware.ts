@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { Locals } from "../interfaces/locals.interface";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { getConfig } from "../utils/config.utils";
-import { bapContextBuilder } from "../utils/context.utils";
+import { bapContextBuilder, bppContextBuilder } from "../utils/context.utils";
 
 export async function contextBuilderMiddleware(req: Request, res: Response<{}, Locals>, next: NextFunction, action: string) {
     try {
@@ -13,7 +13,7 @@ export async function contextBuilderMiddleware(req: Request, res: Response<{}, L
                 break;
             }
             case AppMode.bpp:{
-                context=bapContextBuilder(req.body.context, action);
+                context=bppContextBuilder(req.body.context, action);
                 break;
             }
         }
