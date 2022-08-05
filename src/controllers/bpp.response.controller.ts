@@ -34,6 +34,7 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
         const action=responseBody.context.action as RequestActions;
         const bap_uri=responseBody.context.bap_uri;
 
+        // Working fine till here.
         const requestCache=await RequestCache.getInstance().check(message_id, action);
         if(!requestCache){
             errorCallback({
@@ -45,7 +46,6 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
             return;
         }
 
-        console.log(responseBody);
         const axios_config = await createAuthHeaderConfig(responseBody);
         
         let response:BecknResponse|null=null;

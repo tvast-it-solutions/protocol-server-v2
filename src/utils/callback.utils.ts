@@ -9,10 +9,6 @@ import { getConfig } from "./config.utils";
 
 async function makeClientCallback(data:any){
     try {
-        if(getConfig().app.gateway.mode!=GatewayMode.client){
-            throw new Exception(ExceptionType.Gateway_InvalidUse, "Gateway mode is not client", 500);
-        }
-    
         if(getConfig().client.type!=ClientConfigType.webhook){
             throw new Exception(ExceptionType.Client_InvalidCall, "Client type is not webhook", 500);
         }
