@@ -16,9 +16,11 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { becknContextSchema } from "../schemas/becknContext.schema";
+import { acknowledgeACK } from "../utils/acknowledgement.utils";
 
 export const bppClientResponseHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: ResponseActions) => {
     try {
+        acknowledgeACK(res, req.body.context);
         await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     } catch (err) {
         if(err instanceof Exception){
