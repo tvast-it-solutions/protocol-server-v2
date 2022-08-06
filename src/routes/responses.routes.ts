@@ -2,10 +2,10 @@ import { NextFunction, Request, Response, Router } from "express";
 import { bapNetworkResponseHandler } from "../controllers/bap.response.controller";
 import { bppClientResponseHandler } from "../controllers/bpp.response.controller";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
-import { authValidatorMiddleware } from "../middlewares/auth.middleware";
+import { authBuilderMiddleware, authValidatorMiddleware } from "../middlewares/auth.middleware";
 import { contextBuilderMiddleware } from "../middlewares/context.middleware";
 import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware";
-import openApiValidatorMiddleware from "../middlewares/validator.middleware";
+import openApiValidatorMiddleware from "../middlewares/schemaValidator.middleware";
 import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
@@ -32,14 +32,14 @@ if ((getConfig().app.mode === AppMode.bap) && (getConfig().app.gateway.mode === 
 }
 
 // BPP Client-Side Gateway Configuration.
-if ((getConfig().app.mode === AppMode.bpp) && (getConfig().app.gateway.mode === GatewayMode.network)) {
+if ((getConfig().app.mode === AppMode.bpp) && (getConfig().app.gateway.mode === GatewayMode.client)) {
     const responseActions = getConfig().app.actions.responses;
     Object.keys(ResponseActions).forEach(action => {
         if (responseActions[action as ResponseActions]) {
             responsesRouter.post(`/${action}`, jsonCompressorMiddleware, 
             async (req: Request, res: Response, next: NextFunction) =>{
                 await contextBuilderMiddleware(req, res, next, action);
-            }, openApiValidatorMiddleware, 
+            }, authBuilderMiddleware, openApiValidatorMiddleware, 
             async (req: Request, res: Response, next: NextFunction) => {
                 await bppClientResponseHandler(req, res, next, action as ResponseActions);
             });

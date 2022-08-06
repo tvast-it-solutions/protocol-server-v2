@@ -1,6 +1,7 @@
 import { Db } from "mongodb";
 import { Exception, ExceptionType } from "../../models/exception.model";
-import { BecknErrorDataType, SyncCacheDataType, syncCacheSchema } from "../../schemas/cache/sync.cache.schema";
+import { BecknErrorDataType } from "../../schemas/becknError.schema";
+import { SyncCacheDataType, syncCacheSchema } from "../../schemas/cache/sync.cache.schema";
 import { RequestActions } from "../../schemas/configs/actions.app.config.schema";
 import { ClientConfigType, SyncrhonousClientConfigDataType } from "../../schemas/configs/client.config.schema";
 import { getConfig } from "../config.utils";

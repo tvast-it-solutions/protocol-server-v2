@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { Locals } from "../interfaces/locals.interface";
+import { AppMode } from "../schemas/configs/app.config.schema";
+import { NetworkPaticipantType } from "../schemas/subscriberDetails.schema";
 import { createAuthHeaderConfig, getSenderDetails, verifyHeader } from "../utils/auth.utils";
+import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
+import { getSubscriberDetails } from "../utils/lookup.utils";
 const config = require("config");
 
 export const authValidatorMiddleware = async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
@@ -49,6 +53,8 @@ export async function authBuilderMiddleware(req: Request, res: Response<{}, Loca
     try {
         const axios_config = await createAuthHeaderConfig(req.body);
         req.headers.authorization = axios_config.headers.authorization;
+        const senderDetails=await getSubscriberDetails(getConfig().app.subscriberId, getConfig().app.uniqueKey);
+        res.locals.sender=senderDetails;
         next();
     } catch (error) {
         next(error)

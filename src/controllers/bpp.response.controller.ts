@@ -14,9 +14,13 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { createAuthHeaderConfig } from "../utils/auth.utils";
 import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
+import { ActionUtils } from "../utils/actions.utils";
+import { becknContextSchema } from "../schemas/becknContext.schema";
+import { acknowledgeACK } from "../utils/acknowledgement.utils";
 
 export const bppClientResponseHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: ResponseActions) => {
     try {
+        acknowledgeACK(res, req.body.context);
         await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     } catch (err) {
         if(err instanceof Exception){
@@ -30,13 +34,15 @@ export const bppClientResponseHandler = async (req: Request, res: Response<{}, L
 export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | null) => {
     try {
         const responseBody=JSON.parse(msg?.content.toString()!);
+        const context=becknContextSchema.parse(responseBody.context);
         const message_id=responseBody.context.message_id;
-        const action=responseBody.context.action as RequestActions;
+        const requestAction=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
+        const action=context.action;
         const bap_uri=responseBody.context.bap_uri;
 
-        const requestCache=await RequestCache.getInstance().check(message_id, action);
+        const requestCache=await RequestCache.getInstance().check(message_id, requestAction);
         if(!requestCache){
-            errorCallback({
+            errorCallback(context, {
                 // TODO: change this error code.
                 code: 651641,
                 type: BecknErrorType.coreError,
@@ -81,7 +87,9 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
                 break;
             }
             case ClientConfigType.webhook:{
-                errorCallback({
+                errorCallback(
+                    context,
+                    {
                     // TODO: change the error code.
                     code: 354845,
                     message: "Network call failed",

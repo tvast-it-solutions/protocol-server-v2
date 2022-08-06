@@ -2,8 +2,6 @@ import { z } from "zod";
 import { becknErrorSchema } from "../becknError.schema";
 import { RequestActions } from "../configs/actions.app.config.schema";
 
-export type BecknErrorDataType = z.infer<typeof becknErrorSchema>;
-
 export const syncCacheSchema = z.object({
     message_id: z.string(),
     action: z.nativeEnum(RequestActions),

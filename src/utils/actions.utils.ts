@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { RequestActions, ResponseActions } from "../schemas/configs/actions.app.config.schema";
 
 export class ActionUtils{
@@ -49,5 +50,14 @@ export class ActionUtils{
             case ResponseActions.on_update:
                 return RequestActions.update;
         }
+    }
+
+    public static parseAction(action: string): RequestActions | ResponseActions{
+        const actionSchema=z.union([
+            z.nativeEnum(RequestActions),
+            z.nativeEnum(ResponseActions)
+        ]);
+
+        return actionSchema.parse(action);
     }
 }

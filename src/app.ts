@@ -1,5 +1,6 @@
 import Express, { NextFunction, Request, Response } from "express"
 import { Exception } from "./models/exception.model"
+import { BecknErrorDataType, becknErrorSchema, BecknErrorType } from "./schemas/becknError.schema"
 import { RequestActions } from "./schemas/configs/actions.app.config.schema"
 import { LookupCache } from "./utils/cache/lookup.cache.utils"
 import { RequestCache } from "./utils/cache/request.cache.utils"
@@ -46,18 +47,34 @@ const initializeExpress=async()=>{
     app.use('/', responsesRouter);
 
     // Error Handler.
-    app.use((err : Exception, req : Request, res : Response, next : NextFunction) => {
-        logger.error(err);
-        res.status(err.code || 500).json({
-            message: {
-                ack:{
-                    status: "NACK"
-                }
-            },
-            error: {
-                message: err.toString()
-            }
-        })
+    app.use((err : any, req : Request, res : Response, next : NextFunction) => {
+        console.log(err);
+        if(err instanceof Exception){
+            const errorData ={
+                code: err.code,
+                message: err.message,
+                data: err.errorData,
+                type: BecknErrorType.domainError
+            } as BecknErrorDataType;
+            res.status(err.code).json({
+                message: {
+                    ack:{
+                        status: "NACK"
+                    }
+                },
+                error: errorData
+            });
+        }
+        else{
+            res.status(err.code || 500).json({
+                message: {
+                    ack:{
+                        status: "NACK"
+                    }
+                },
+                error: err
+            });
+        }
     })
 
     const PORT: number = getConfig().server.port;
@@ -68,7 +85,6 @@ const initializeExpress=async()=>{
 
 const main = async () => {
     try {
-        console.log(getConfig());
 
         await ClientUtils.initializeConnection();
         await GatewayUtils.getInstance().initialize();
