@@ -5,6 +5,7 @@ import { NetworkPaticipantType } from "../schemas/subscriberDetails.schema";
 import { createAuthHeaderConfig, getSenderDetails, verifyHeader } from "../utils/auth.utils";
 import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
+import { getSubscriberDetails } from "../utils/lookup.utils";
 const config = require("config");
 
 export const authValidatorMiddleware = async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
@@ -52,13 +53,8 @@ export async function authBuilderMiddleware(req: Request, res: Response<{}, Loca
     try {
         const axios_config = await createAuthHeaderConfig(req.body);
         req.headers.authorization = axios_config.headers.authorization;
-        res.locals.sender={
-            signing_public_key: getConfig().app.publicKey,
-            subscriber_id: getConfig().app.subscriberId,
-            subscriber_url: getConfig().app.subscriberUri,
-            type: getConfig().app.mode==AppMode.bap ? NetworkPaticipantType.BAP : NetworkPaticipantType.BPP,
-            valid_until: new Date(new Date().getTime()+1000*60*60*24*30).toISOString()
-        }
+        const senderDetails=await getSubscriberDetails(getConfig().app.subscriberId, getConfig().app.uniqueKey);
+        res.locals.sender=senderDetails;
         next();
     } catch (error) {
         next(error)

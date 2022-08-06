@@ -34,10 +34,11 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
         const responseBody=JSON.parse(msg?.content.toString()!);
         const context=becknContextSchema.parse(responseBody.context);
         const message_id=responseBody.context.message_id;
-        const action=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
+        const requestAction=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
+        const action=context.action;
         const bap_uri=responseBody.context.bap_uri;
 
-        const requestCache=await RequestCache.getInstance().check(message_id, action);
+        const requestCache=await RequestCache.getInstance().check(message_id, requestAction);
         if(!requestCache){
             errorCallback(context, {
                 // TODO: change this error code.
