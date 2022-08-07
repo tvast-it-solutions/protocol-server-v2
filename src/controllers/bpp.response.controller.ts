@@ -23,25 +23,29 @@ export const bppClientResponseHandler = async (req: Request, res: Response<{}, L
         acknowledgeACK(res, req.body.context);
         await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     } catch (err) {
-        if(err instanceof Exception){
-            throw err;
+        let exception: Exception | null = null;
+        if (err instanceof Exception) {
+            exception = err;
         }
-
-        throw new Exception(ExceptionType.Request_Failed, "BPP Response Failed", 400, err);
+        else {
+            exception = new Exception(ExceptionType.Request_Failed, "BPP Response Failed at bppClientResponseHandler", 500, err);
+        }
+        
+        logger.error(exception);
     }
 }
 
 export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | null) => {
     try {
-        const responseBody=JSON.parse(msg?.content.toString()!);
-        const context=becknContextSchema.parse(responseBody.context);
-        const message_id=responseBody.context.message_id;
-        const requestAction=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
-        const action=context.action;
-        const bap_uri=responseBody.context.bap_uri;
+        const responseBody = JSON.parse(msg?.content.toString()!);
+        const context = becknContextSchema.parse(responseBody.context);
+        const message_id = responseBody.context.message_id;
+        const requestAction = ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
+        const action = context.action;
+        const bap_uri = responseBody.context.bap_uri;
 
-        const requestCache=await RequestCache.getInstance().check(message_id, requestAction);
-        if(!requestCache){
+        const requestCache = await RequestCache.getInstance().check(message_id, requestAction);
+        if (!requestCache) {
             errorCallback(context, {
                 // TODO: change this error code.
                 code: 651641,
@@ -52,54 +56,62 @@ export const bppClientResponseSettler = async (msg: AmqbLib.ConsumeMessage | nul
         }
 
         const axios_config = await createAuthHeaderConfig(responseBody);
-        
-        let response:BecknResponse|null=null;
-        if(requestCache.sender.type==NetworkPaticipantType.BG){
-            const subscribers=[
+
+        let response: BecknResponse | null = null;
+        if (requestCache.sender.type == NetworkPaticipantType.BG) {
+            const subscribers = [
                 requestCache.sender,
             ];
 
-            response=await callNetwork(subscribers, responseBody, axios_config, action);
+            response = await callNetwork(subscribers, responseBody, axios_config, action);
         }
-        else{
-            const subscribers:Array<SubscriberDetail>=[
+        else {
+            const subscribers: Array<SubscriberDetail> = [
                 {
                     ...requestCache.sender,
                     subscriber_url: bap_uri,
                 },
             ];
 
-            response=await callNetwork(subscribers, responseBody, axios_config, action);
+            response = await callNetwork(subscribers, responseBody, axios_config, action);
         }
 
-        if((response.status==200)||(response.status==202)||(response.status==206)){
+        if ((response.status == 200) || (response.status == 202) || (response.status == 206)) {
             // Network Calls Succeeded.
             return;
         }
 
-        switch(getConfig().client.type){
-            case ClientConfigType.synchronous:{
+        switch (getConfig().client.type) {
+            case ClientConfigType.synchronous: {
                 throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Synchronous mode is not available for BPP.", 400);
                 break;
             }
-            case ClientConfigType.messageQueue:{
+            case ClientConfigType.messageQueue: {
                 // TODO: implement message queue.
                 break;
             }
-            case ClientConfigType.webhook:{
+            case ClientConfigType.webhook: {
                 errorCallback(
                     context,
                     {
-                    // TODO: change the error code.
-                    code: 354845,
-                    message: "Network call failed",
-                    type: BecknErrorType.coreError,
-                    data: [response],
-                });
+                        // TODO: change the error code.
+                        code: 354845,
+                        message: "Network call failed",
+                        type: BecknErrorType.coreError,
+                        data: [response],
+                    });
                 break;
             }
         }
     } catch (error) {
-        logger.error(error)
+        let exception: Exception | null = null;
+        if (error instanceof Exception) {
+            exception = error;
+        }
+        else {
+            exception = new Exception(ExceptionType.Request_Failed, "BPP Response Failed at bppClientResponseSettler", 500, error);
+        }
+
+        logger.error(exception);
     }
 }

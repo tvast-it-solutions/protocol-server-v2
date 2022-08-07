@@ -76,6 +76,7 @@ export enum ExceptionType {
     Acknowledgement_Failed = "Acknowledgement_Failed",
 
     Request_Failed = "Request_Failed",
+    Response_Failed = "Response_Failed",
 
     OpenApiSchema_ParsingError = "OpenApiSchema_ParsingError",
 }

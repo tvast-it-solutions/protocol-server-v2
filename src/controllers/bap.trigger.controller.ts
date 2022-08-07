@@ -46,11 +46,15 @@ export const bapClientTriggerHandler = async (req: Request, res: Response<{}, Lo
             sendSyncResponses(res, req.body.context.message_id, action, req.body.context);
         }
     } catch (err) {
+        let exception: Exception|null=null;
         if(err instanceof Exception){
-            throw err;
+            exception=err;
+        }
+        else{
+            exception=new Exception(ExceptionType.Request_Failed, "BAP Request Failed at bapClientTriggerHandler", 500, err);
         }
 
-        throw new Exception(ExceptionType.Request_Failed, "BAP Request Failed", 400, err);
+        logger.error(exception);
     }
 };
 
@@ -123,8 +127,14 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
         return;
     }
     catch (err) {
-        logger.error(err);
+        let exception: Exception|null=null;
+        if(err instanceof Exception){
+            exception=err;
+        }
+        else{
+            exception=new Exception(ExceptionType.Request_Failed, "BAP Request Failed at bapClientTriggerSettler", 500, err);
+        }
 
-        return;
+        logger.error(exception);
     }
 }

@@ -34,11 +34,15 @@ export const bapNetworkResponseHandler = async (req: Request, res: Response<{}, 
         await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
 
     } catch (err) {
+        let exception: Exception|null=null;
         if(err instanceof Exception){
-            throw err;
+            exception=err;
+        }
+        else{
+            exception=new Exception(ExceptionType.Response_Failed, "BAP Response Failed at bapNetworkResponseHandler", 500, err);
         }
 
-        throw new Exception(ExceptionType.Request_Failed, "BAP Request Failed", 400, err);
+        logger.error(exception);
     }
 }
 
@@ -63,6 +67,14 @@ export const bapNetworkResponseSettler = async (message: AmqbLib.ConsumeMessage 
         }
     }
     catch (err) {
+        let exception: Exception|null=null;
+        if(err instanceof Exception){
+            exception=err;
+        }
+        else{
+            exception=new Exception(ExceptionType.Response_Failed, "BAP Response Failed at bapNetworkResponseSettler", 500, err);
+        }
+        
         logger.error(err)    
     }
 }

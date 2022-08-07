@@ -19,42 +19,54 @@ export const bppNetworkRequestHandler = async (req: Request, res: Response<{}, L
     try {
         acknowledgeACK(res, req.body.context);
 
-        const message_id=req.body.context.message_id;
-        const transaction_id=req.body.context.transaction_id;
-        const ttl=moment.duration(req.body.context.ttl).asMilliseconds();
+        const message_id = req.body.context.message_id;
+        const transaction_id = req.body.context.transaction_id;
+        const ttl = moment.duration(req.body.context.ttl).asMilliseconds();
 
         await RequestCache.getInstance().cache(parseRequestCache(transaction_id, message_id, action, res.locals.sender!), ttl);
 
         await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
     }
     catch (err) {
-        if(err instanceof Exception){
-            throw err;
+        let exception: Exception | null = null;
+        if (err instanceof Exception) {
+            exception = err;
+        }
+        else {
+            exception = new Exception(ExceptionType.Request_Failed, "BPP Request Failed at bppNetworkRequestHandler", 500, err);
         }
 
-        throw new Exception(ExceptionType.Request_Failed, "BAP Request Failed", 400, err);
+        logger.error(exception);
     }
 };
 
 export const bppNetworkRequestSettler = async (msg: AmqbLib.ConsumeMessage | null) => {
     try {
-        const requestBody=JSON.parse(msg?.content.toString()!);
-        switch(getConfig().client.type){
-            case  ClientConfigType.synchronous:{
-                throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Synchronous mode is not available for BPP.", 400);
+        const requestBody = JSON.parse(msg?.content.toString()!);
+        switch (getConfig().client.type) {
+            case ClientConfigType.synchronous: {
+                throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Synchronous mode is not available for BPP.", 500);
                 break;
             }
-            case  ClientConfigType.webhook:{
+            case ClientConfigType.webhook: {
                 requestCallback(requestBody);
                 break;
             }
-            case  ClientConfigType.messageQueue:{
+            case ClientConfigType.messageQueue: {
                 // TODO: implement message queue
                 break;
             }
         }
     }
     catch (err) {
-        logger.error(err)
+        let exception: Exception | null = null;
+        if (err instanceof Exception) {
+            exception = err;
+        }
+        else {
+            exception = new Exception(ExceptionType.Request_Failed, "BPP Request Failed at bppNetworkRequestSettler", 500, err);
+        }
+        
+        logger.error(exception)
     }
 }
