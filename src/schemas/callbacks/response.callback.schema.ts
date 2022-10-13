@@ -5,7 +5,7 @@ import { becknErrorSchema } from "../becknError.schema";
 export const responseCallbackSchema = z.object({
     context: becknContextSchema,
     message: z.any(),
-    error: becknErrorSchema,
+    error: becknErrorSchema.optional(),
 });
 
 export type ResponseCallbackDataType = z.infer<typeof responseCallbackSchema>;
