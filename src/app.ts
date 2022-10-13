@@ -16,7 +16,7 @@ const app = Express()
 
 app.use(Express.json())
 
-const initializeExpress=async()=>{
+const initializeExpress=async(successCallback: Function)=>{
     const app = Express()
     
     // Middleware for request body conversion to json and raw body creation.
@@ -80,6 +80,7 @@ const initializeExpress=async()=>{
     const PORT: number = getConfig().server.port;
     app.listen(PORT, () => {
         logger.info('Protocol Server started on PORT : '+PORT);
+        successCallback();
     })
 }
 
@@ -94,8 +95,12 @@ const main = async () => {
         await LookupCache.getInstance().initialize();
         await RequestCache.getInstance().initialize();
 
-        await initializeExpress();
-        
+        await initializeExpress(()=>{
+            logger.info("Protocol Server Started Successfully");
+            logger.info("Mode: "+getConfig().app.mode.toLocaleUpperCase());
+            logger.info("Gateway Type: "+getConfig().app.gateway.mode.toLocaleUpperCase().substring(0,1)+getConfig().app.gateway.mode.toLocaleUpperCase().substring(1));
+        });
+
     } catch (err) {
         if(err instanceof Exception){
             logger.error(err.toString());
