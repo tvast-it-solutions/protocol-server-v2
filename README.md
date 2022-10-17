@@ -193,3 +193,7 @@ All the requests or responses sent from the Client-side Application are sent to 
 Each incoming request or response from the network is handled by the Network-side gateway. The Network-side gateway validates the request or response and sends it to the Client-side gateway.
 
 The Network-side is responsible for communicating with the Beckn Network while the Client-side is responsible for communicating with the Client-side Application.
+
+### License
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
