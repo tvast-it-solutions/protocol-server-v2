@@ -5,7 +5,7 @@ server:
 # Mandatory.
 cache:
   host: "0.0.0.0"
-  port: 6380
+  port: 6379
   ttl: "PT10M"
   # Optional. Default is 0.
   db: 1
@@ -35,7 +35,7 @@ app:
     mode: client
     inboxQueue: "inbox"
     outboxQueue: "outbox"
-    amqpURL: "amqp://tvast:password@0.0.0.0:5673"
+    amqpURL: "amqp://tvast:password@0.0.0.0:5672"
 
   # Mandatory.
   actions:
